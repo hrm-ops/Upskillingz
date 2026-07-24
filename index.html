@@ -1,0 +1,1188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Upskillingz — SP Electives Hub</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700;800&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<style>
+  :root{
+    --paper: #F3F0E6;
+    --paper-raised: #FBFAF4;
+    --ink: #16172B;
+    --ink-soft: #5C5C6B;
+    --cobalt: #3542FF;
+    --cobalt-deep: #232CC9;
+    --lime: #D8FF5C;
+    --pink: #FF6F9C;
+    --line: rgba(22,23,43,0.14);
+    --radius: 14px;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:var(--paper);
+    background-image:
+      radial-gradient(circle at 1px 1px, rgba(22,23,43,0.06) 1px, transparent 0);
+    background-size: 22px 22px;
+    color:var(--ink);
+    font-family:'Inter', sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3, .display{
+    font-family:'Space Grotesk', sans-serif;
+    font-weight:800;
+    letter-spacing:-0.02em;
+    line-height:1.02;
+    margin:0;
+  }
+  .mono{
+    font-family:'IBM Plex Mono', monospace;
+    letter-spacing:0.02em;
+  }
+  a{color:inherit;text-decoration:none;}
+  button{font-family:inherit;cursor:pointer;}
+
+  /* ---------- Layout shell ---------- */
+  .wrap{max-width:1180px; margin:0 auto; padding:0 28px;}
+  header.site{
+    position:sticky; top:0; z-index:50;
+    background:rgba(243,240,230,0.88);
+    backdrop-filter: blur(10px);
+    border-bottom:2px solid var(--ink);
+  }
+  .nav-row{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:16px 0;
+  }
+  .brand{display:flex; align-items:center; gap:10px;}
+  .brand-mark{
+    width:34px; height:34px; background:var(--ink); border-radius:8px;
+    display:flex; align-items:center; justify-content:center;
+    transform:rotate(-6deg);
+  }
+  .brand-mark span{color:var(--lime); font-family:'Space Grotesk'; font-weight:800; font-size:16px;}
+  .brand-name{font-family:'Space Grotesk'; font-weight:800; font-size:19px;}
+  .brand-name em{font-style:normal; color:var(--cobalt);}
+
+  nav.main-nav{display:flex; align-items:center; gap:4px;}
+  .nav-btn{
+    padding:9px 16px; font-size:14.5px; font-weight:600; border:none; background:transparent;
+    border-radius:999px; color:var(--ink-soft); transition:.15s;
+  }
+  .nav-btn:hover{color:var(--ink); background:rgba(22,23,43,0.06);}
+  .nav-btn.active{background:var(--ink); color:var(--paper-raised);}
+
+  .nav-socials{display:flex; align-items:center; gap:8px;}
+  .icon-link{
+    width:36px; height:36px; border-radius:50%; border:2px solid var(--ink);
+    display:flex; align-items:center; justify-content:center; transition:.15s;
+    background:var(--paper-raised);
+  }
+  .icon-link:hover{background:var(--ink); color:var(--paper-raised);}
+  .icon-link svg{width:17px; height:17px;}
+
+  .mobile-toggle{display:none; border:2px solid var(--ink); border-radius:8px; background:var(--paper-raised); width:40px; height:40px; align-items:center; justify-content:center;}
+
+  /* ---------- Buttons ---------- */
+  .btn{
+    display:inline-flex; align-items:center; gap:8px;
+    padding:14px 24px; border-radius:999px; font-weight:700; font-size:15px;
+    border:2px solid var(--ink); transition:.15s; white-space:nowrap;
+  }
+  .btn-primary{background:var(--ink); color:var(--paper-raised);}
+  .btn-primary:hover{background:var(--cobalt-deep); border-color:var(--cobalt-deep); transform:translateY(-2px);}
+  .btn-ghost{background:transparent; color:var(--ink);}
+  .btn-ghost:hover{background:var(--ink); color:var(--paper-raised); transform:translateY(-2px);}
+  .btn-lime{background:var(--lime); border-color:var(--ink); color:var(--ink);}
+  .btn-lime:hover{transform:translateY(-2px);}
+  .btn-sm{padding:9px 16px; font-size:13.5px;}
+
+  section{display:none;}
+  section.active{display:block; animation:fadeUp .45s ease both;}
+  @keyframes fadeUp{from{opacity:0; transform:translateY(10px);} to{opacity:1; transform:translateY(0);}}
+
+  /* ---------- HOME ---------- */
+  .hero{padding:88px 0 64px; position:relative; overflow:hidden;}
+  .hero-tag{
+    display:inline-flex; align-items:center; gap:8px; padding:6px 14px;
+    border:2px solid var(--ink); border-radius:999px; font-size:13px; font-weight:600;
+    margin-bottom:26px; background:var(--paper-raised);
+  }
+  .hero-tag .dot{width:8px; height:8px; border-radius:50%; background:var(--cobalt);}
+  .hero h1{font-size:clamp(40px, 6.4vw, 78px);}
+  .hero h1 .hl{background:var(--lime); padding:0 10px; display:inline-block; transform:rotate(-1deg);}
+  .hero-sub{
+    font-size:18px; color:var(--ink-soft); max-width:560px; margin:24px 0 36px; line-height:1.55;
+  }
+  .hero-actions{display:flex; flex-wrap:wrap; gap:14px; margin-bottom:56px;}
+  .stat-row{display:grid; grid-template-columns:repeat(3,1fr); gap:0; border-top:2px solid var(--ink);}
+  .stat{padding:20px 24px 0; border-right:2px solid var(--ink);}
+  .stat:last-child{border-right:none;}
+  .stat b{font-family:'Space Grotesk'; font-size:30px; display:block;}
+  .stat span{font-size:13px; color:var(--ink-soft);}
+
+  .section-head{margin:96px 0 36px; display:flex; align-items:flex-end; justify-content:space-between; gap:20px; flex-wrap:wrap;}
+  .section-head h2{font-size:clamp(26px,3.4vw,38px);}
+  .eyebrow{font-family:'IBM Plex Mono'; font-size:12.5px; text-transform:uppercase; color:var(--cobalt); font-weight:600; letter-spacing:0.08em; margin-bottom:8px; display:block;}
+
+  .why-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:18px; margin-bottom:40px;}
+  .why-card{
+    background:var(--paper-raised); border:2px solid var(--ink); border-radius:var(--radius);
+    padding:24px; transition:.2s;
+  }
+  .why-card:hover{transform:translateY(-4px); box-shadow:6px 6px 0 var(--ink);}
+  .why-card .num{font-family:'IBM Plex Mono'; font-size:13px; color:var(--ink-soft);}
+  .why-card h3{font-size:20px; margin:14px 0 10px;}
+  .why-card p{font-size:14.5px; color:var(--ink-soft); line-height:1.55; margin:0;}
+
+  .preview-strip{display:flex; gap:16px; overflow-x:auto; padding-bottom:12px; margin-bottom:20px;}
+  .preview-strip::-webkit-scrollbar{height:6px;}
+  .preview-strip::-webkit-scrollbar-thumb{background:var(--ink); border-radius:10px;}
+
+  .cta-band{
+    margin:100px 0 60px; background:var(--ink); color:var(--paper-raised);
+    border-radius:20px; padding:56px 44px; display:flex; align-items:center; justify-content:space-between;
+    gap:30px; flex-wrap:wrap;
+  }
+  .cta-band h2{color:var(--paper-raised); font-size:clamp(26px,3.6vw,40px); max-width:520px;}
+  .cta-band p{color:#B8B9CC; margin:14px 0 0; max-width:460px; font-size:15px;}
+  .cta-actions{display:flex; gap:12px; flex-wrap:wrap;}
+  .cta-band .btn-ghost{border-color:var(--paper-raised); color:var(--paper-raised);}
+  .cta-band .btn-ghost:hover{background:var(--paper-raised); color:var(--ink);}
+
+  /* ---------- ELECTIVES ---------- */
+  .page-head{padding:56px 0 28px;}
+  .page-head .eyebrow{margin-bottom:10px;}
+  .page-head h1{font-size:clamp(34px,5vw,52px);}
+  .page-head p{color:var(--ink-soft); max-width:600px; font-size:15.5px; margin-top:16px; line-height:1.6;}
+
+  .source-note{
+    display:flex; align-items:center; gap:10px; background:var(--paper-raised); border:2px dashed var(--ink);
+    border-radius:12px; padding:14px 18px; font-size:13.5px; color:var(--ink-soft); margin:22px 0 34px; flex-wrap:wrap;
+  }
+  .source-note a{color:var(--cobalt-deep); font-weight:700; border-bottom:2px solid var(--cobalt-deep);}
+
+  .search-bar{
+    display:flex; align-items:center; gap:10px; background:var(--paper-raised);
+    border:2px solid var(--ink); border-radius:999px; padding:6px 8px 6px 20px; margin-bottom:22px;
+  }
+  .search-bar svg{flex-shrink:0; opacity:.6;}
+  .search-bar input{
+    flex:1; border:none; background:transparent; outline:none; font-size:15px; font-family:inherit; padding:10px 0; color:var(--ink);
+  }
+  .search-bar input::placeholder{color:#9C9CA8;}
+  .search-clear-btn{background:var(--ink); color:var(--paper-raised); border-radius:999px; padding:10px 18px; font-size:13.5px; font-weight:700; border:none;}
+
+  .filter-block{margin-bottom:10px;}
+  .filter-label{font-family:'IBM Plex Mono'; font-size:11.5px; text-transform:uppercase; letter-spacing:0.06em; color:var(--ink-soft); margin-bottom:10px; display:block;}
+  .chip-row{display:flex; flex-wrap:wrap; gap:8px; margin-bottom:22px;}
+  .chip{
+    padding:8px 15px; border:2px solid var(--ink); border-radius:999px; font-size:13px; font-weight:600;
+    background:var(--paper-raised); transition:.15s;
+  }
+  .chip:hover{background:rgba(53,66,255,0.08);}
+  .chip.active{background:var(--cobalt); border-color:var(--cobalt); color:#fff;}
+
+  .results-meta{font-size:13.5px; color:var(--ink-soft); margin:6px 0 20px; font-family:'IBM Plex Mono';}
+
+  .card-grid{
+    display:grid; grid-template-columns:repeat(3, 1fr); gap:18px; margin-bottom:20px;
+  }
+  .mod-card{
+    background:var(--paper-raised); border:2px solid var(--ink); border-radius:var(--radius);
+    padding:0; overflow:hidden; transition:.2s; display:flex; flex-direction:column;
+  }
+  .mod-card:hover{transform:translateY(-4px) rotate(-0.3deg); box-shadow:7px 7px 0 var(--ink);}
+  .mod-card-top{padding:20px 20px 16px; flex:1;}
+  .mod-tags{display:flex; gap:6px; flex-wrap:wrap; margin-bottom:14px;}
+  .tag-school{
+    font-family:'IBM Plex Mono'; font-size:10.5px; font-weight:600; background:var(--ink); color:var(--lime);
+    padding:4px 9px; border-radius:5px; text-transform:uppercase; letter-spacing:.03em;
+  }
+  .tag-poly{
+    font-family:'IBM Plex Mono'; font-size:10.5px; font-weight:700; padding:4px 9px; border-radius:5px;
+    text-transform:uppercase; letter-spacing:.03em; color:#fff;
+  }
+  .chip.poly-chip.active{color:#fff;}
+  .tag-interest{
+    font-family:'IBM Plex Mono'; font-size:10.5px; font-weight:600; border:1.5px solid var(--ink); color:var(--ink);
+    padding:3px 9px; border-radius:5px;
+  }
+  .mod-card h3{font-size:18px; margin-bottom:8px; line-height:1.2;}
+  .mod-card p{font-size:13.5px; color:var(--ink-soft); line-height:1.55; margin:0;}
+  .mod-card-bottom{
+    border-top:2px dashed var(--ink); padding:14px 20px; display:flex; align-items:center; justify-content:space-between;
+    background:repeating-linear-gradient(90deg, transparent, transparent 8px);
+  }
+  .mod-code{font-family:'IBM Plex Mono'; font-size:12px; color:var(--ink-soft);}
+  .mod-link{font-size:12.5px; font-weight:700; color:var(--cobalt-deep); display:flex; align-items:center; gap:4px;}
+  .mod-link:hover{text-decoration:underline;}
+
+  .empty-state{
+    text-align:center; padding:70px 20px; border:2px dashed var(--ink); border-radius:16px; margin-bottom:30px;
+  }
+  .empty-state h3{font-size:22px; margin-bottom:8px;}
+  .empty-state p{color:var(--ink-soft); font-size:14.5px; margin-bottom:20px;}
+
+  .full-listing-cta{
+    display:flex; align-items:center; justify-content:space-between; gap:20px; flex-wrap:wrap;
+    background:var(--ink); color:var(--paper-raised); border-radius:18px; padding:36px 34px; margin:50px 0 70px;
+  }
+  .full-listing-cta h3{color:var(--paper-raised); font-size:22px; max-width:420px;}
+  .full-listing-cta p{color:#B8B9CC; font-size:14px; margin-top:8px;}
+
+  /* ---------- ABOUT ---------- */
+  .about-hero{padding:56px 0 20px;}
+  .about-lead{font-size:clamp(22px,3vw,30px); font-family:'Space Grotesk'; font-weight:700; line-height:1.35; max-width:780px;}
+  .about-lead .hl{background:var(--lime); padding:0 6px;}
+  .about-grid{display:grid; grid-template-columns:1.1fr .9fr; gap:50px; margin:50px 0 70px; align-items:start;}
+  .about-grid p{font-size:15.5px; line-height:1.75; color:var(--ink-soft); margin-bottom:18px;}
+  .about-grid h3{font-size:15px; margin-bottom:16px; font-family:'IBM Plex Mono'; text-transform:uppercase; letter-spacing:.05em;}
+  .fact-card{background:var(--paper-raised); border:2px solid var(--ink); border-radius:var(--radius); padding:24px; margin-bottom:16px;}
+  .fact-card b{display:block; font-family:'Space Grotesk'; font-size:24px; margin-bottom:4px;}
+  .fact-card span{font-size:13.5px; color:var(--ink-soft);}
+
+  .value-list{list-style:none; margin:0; padding:0; display:grid; gap:14px;}
+  .value-list li{
+    display:flex; gap:14px; padding:18px; background:var(--paper-raised); border:2px solid var(--ink); border-radius:12px;
+  }
+  .value-list .v-mark{
+    width:30px; height:30px; border-radius:8px; background:var(--cobalt); flex-shrink:0;
+    display:flex; align-items:center; justify-content:center; color:#fff; font-weight:800; font-family:'Space Grotesk'; font-size:14px;
+  }
+  .value-list h4{font-size:15.5px; margin-bottom:4px;}
+  .value-list p{font-size:13.5px; color:var(--ink-soft); margin:0; line-height:1.5;}
+
+  /* ---------- COMMUNITY ---------- */
+  .comm-hero{padding:56px 0 30px; text-align:center;}
+  .comm-hero h1{font-size:clamp(34px,5vw,54px); max-width:720px; margin:0 auto;}
+  .comm-hero p{color:var(--ink-soft); max-width:520px; margin:18px auto 0; font-size:15.5px; line-height:1.6;}
+
+  .comm-grid{display:grid; grid-template-columns:1fr 1fr; gap:22px; margin:50px 0 70px;}
+  .comm-card{
+    border:2px solid var(--ink); border-radius:20px; padding:38px; position:relative; overflow:hidden;
+  }
+  .comm-card.tg{background:#E9EDFF;}
+  .comm-card.ig{background:#FFE9F1;}
+  .comm-icon{
+    width:56px; height:56px; border-radius:16px; display:flex; align-items:center; justify-content:center;
+    border:2px solid var(--ink); background:var(--paper-raised); margin-bottom:22px;
+  }
+  .comm-icon svg{width:26px; height:26px;}
+  .comm-card h3{font-size:24px; margin-bottom:10px;}
+  .comm-card p{font-size:14.5px; color:var(--ink-soft); line-height:1.6; margin-bottom:24px;}
+
+  .quote-block{
+    border-left:4px solid var(--cobalt); padding:6px 0 6px 22px; margin:60px 0; max-width:640px;
+  }
+  .quote-block p{font-family:'Space Grotesk'; font-size:clamp(20px,2.6vw,26px); font-weight:700; line-height:1.4; margin:0 0 10px;}
+  .quote-block span{font-size:13px; color:var(--ink-soft); font-family:'IBM Plex Mono';}
+
+  /* ---------- FOOTER ---------- */
+  footer.site{border-top:2px solid var(--ink); margin-top:60px; padding:50px 0 34px;}
+  .footer-grid{display:flex; justify-content:space-between; gap:40px; flex-wrap:wrap; margin-bottom:36px;}
+  .footer-brand p{color:var(--ink-soft); font-size:14px; max-width:280px; margin-top:12px; line-height:1.55;}
+  .footer-cols{display:flex; gap:60px; flex-wrap:wrap;}
+  .footer-col h4{font-family:'IBM Plex Mono'; font-size:12px; text-transform:uppercase; letter-spacing:.06em; color:var(--ink-soft); margin-bottom:14px;}
+  .footer-col a{display:block; font-size:14.5px; font-weight:600; margin-bottom:10px;}
+  .footer-col a:hover{color:var(--cobalt-deep);}
+  .footer-bottom{
+    display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:14px;
+    border-top:1px solid var(--line); padding-top:24px; font-size:13px; color:var(--ink-soft);
+  }
+  .footer-bottom a{font-weight:700; color:var(--ink);}
+  .footer-socials{display:flex; gap:10px;}
+
+  /* ---------- RESPONSIVE ---------- */
+  @media (max-width: 880px){
+    nav.main-nav{display:none;}
+    .mobile-toggle{display:flex;}
+    .nav-row{position:relative;}
+    .mobile-menu{
+      display:none; flex-direction:column; gap:6px; padding:14px 0 6px;
+      border-top:2px solid var(--ink); margin-top:14px;
+    }
+    .mobile-menu.open{display:flex;}
+    .mobile-menu .nav-btn{text-align:left; width:100%;}
+    .why-grid{grid-template-columns:1fr;}
+    .card-grid{grid-template-columns:1fr 1fr;}
+    .about-grid{grid-template-columns:1fr;}
+    .comm-grid{grid-template-columns:1fr;}
+    .stat-row{grid-template-columns:1fr; }
+    .stat{border-right:none; border-bottom:2px solid var(--ink); padding-bottom:16px; margin-bottom:16px;}
+  }
+  @media (max-width: 560px){
+    .card-grid{grid-template-columns:1fr;}
+    .cta-band, .full-listing-cta{flex-direction:column; align-items:flex-start;}
+  }
+
+  /* ---------- Ratings & Comments ---------- */
+  .rate-btn{
+    margin-top:10px; width:100%; text-align:left; background:transparent; border:none;
+    font-size:12.5px; font-weight:700; color:var(--cobalt-deep); padding:0; display:flex; align-items:center; gap:6px;
+  }
+  .stars-display{display:flex; align-items:center; gap:4px; font-size:12.5px; color:var(--ink-soft); margin-top:2px;}
+  .stars-display .star{color:#D8B400; font-size:13px;}
+
+  .modal-overlay{
+    display:none; position:fixed; inset:0; background:rgba(22,23,43,0.55); z-index:200;
+    align-items:flex-start; justify-content:center; padding:40px 16px; overflow-y:auto;
+  }
+  .modal-overlay.open{display:flex;}
+  .modal-box{
+    background:var(--paper-raised); border:2px solid var(--ink); border-radius:18px; max-width:560px; width:100%;
+    padding:30px; position:relative; margin-bottom:40px;
+  }
+  .modal-close{
+    position:absolute; top:18px; right:18px; width:32px; height:32px; border-radius:50%; border:2px solid var(--ink);
+    background:var(--paper-raised); display:flex; align-items:center; justify-content:center; font-size:16px;
+  }
+  .modal-tags{display:flex; gap:6px; margin-bottom:10px;}
+  .modal-box h3{font-size:22px; margin-bottom:4px; padding-right:30px;}
+  .modal-sub{font-size:13px; color:var(--ink-soft); margin-bottom:20px;}
+
+  .rate-row{display:flex; align-items:center; gap:14px; padding:16px; background:var(--paper); border:2px solid var(--ink); border-radius:12px; margin-bottom:22px; flex-wrap:wrap;}
+  .star-input{display:flex; gap:3px;}
+  .star-input button{background:none; border:none; font-size:26px; color:#D8D8CC; padding:0; line-height:1;}
+  .star-input button.filled{color:#D8B400;}
+  .rate-avg{font-family:'IBM Plex Mono'; font-size:13px; color:var(--ink-soft);}
+
+  .comment-form textarea{
+    width:100%; border:2px solid var(--ink); border-radius:12px; padding:12px 14px; font-family:inherit; font-size:14px;
+    resize:vertical; min-height:70px; background:var(--paper-raised); color:var(--ink);
+  }
+  .comment-form input[type=text]{
+    width:100%; border:2px solid var(--ink); border-radius:999px; padding:10px 16px; font-family:inherit; font-size:13.5px;
+    margin-bottom:10px; background:var(--paper-raised); color:var(--ink);
+  }
+  .comment-form-msg{font-size:12.5px; margin-top:8px; font-weight:600;}
+  .comment-form-msg.err{color:#D6336C;}
+  .comment-form-msg.ok{color:#00A67E;}
+  .comment-list{margin-top:22px; display:flex; flex-direction:column; gap:12px; max-height:260px; overflow-y:auto;}
+  .comment-item{background:var(--paper); border:1.5px solid var(--line); border-radius:10px; padding:12px 14px;}
+  .comment-item .c-head{display:flex; justify-content:space-between; font-size:12px; color:var(--ink-soft); margin-bottom:5px; font-family:'IBM Plex Mono';}
+  .comment-item p{margin:0; font-size:13.5px; line-height:1.5;}
+  .comment-empty{font-size:13px; color:var(--ink-soft); text-align:center; padding:16px 0;}
+
+  /* ---------- Admin / Moderation ---------- */
+  .admin-gate{max-width:360px; margin:60px auto; text-align:center;}
+  .admin-gate input{
+    width:100%; border:2px solid var(--ink); border-radius:999px; padding:12px 18px; font-size:14px; margin:16px 0;
+    text-align:center; font-family:inherit;
+  }
+  .admin-list{display:flex; flex-direction:column; gap:14px; margin:30px 0;}
+  .admin-item{border:2px solid var(--ink); border-radius:12px; padding:16px 18px; background:var(--paper-raised);}
+  .admin-item .a-head{display:flex; justify-content:space-between; font-size:12px; color:var(--ink-soft); font-family:'IBM Plex Mono'; margin-bottom:8px;}
+  .admin-item p{margin:0 0 12px; font-size:14px; line-height:1.5;}
+  .admin-actions{display:flex; gap:8px;}
+  .admin-actions button{
+    border:2px solid var(--ink); border-radius:999px; padding:7px 16px; font-size:12.5px; font-weight:700; background:var(--paper-raised);
+  }
+  .btn-approve{background:var(--lime) !important;}
+  .btn-reject{background:#FFE0E8 !important; border-color:#D6336C !important;}
+  .status-pill{font-family:'IBM Plex Mono'; font-size:10px; text-transform:uppercase; padding:2px 8px; border-radius:5px;}
+  .status-pill.pending{background:#FFF3C4;}
+  .status-pill.approved{background:#D8FF5C;}
+</style>
+</head>
+<body>
+
+<header class="site">
+  <div class="wrap">
+    <div class="nav-row">
+      <div class="brand" role="button" onclick="goTo('home')" style="cursor:pointer;">
+        <div class="brand-mark"><span>U</span></div>
+        <div class="brand-name">UPSKILLING<em>Z</em></div>
+      </div>
+      <nav class="main-nav" id="mainNav">
+        <button class="nav-btn" data-page="home">Home</button>
+        <button class="nav-btn" data-page="electives">Electives</button>
+        <button class="nav-btn" data-page="about">About</button>
+        <button class="nav-btn" data-page="community">Community</button>
+      </nav>
+      <div style="display:flex; align-items:center; gap:10px;">
+        <div class="nav-socials">
+          <a class="icon-link" href="https://t.me/+BRFFAhOUh6MyZDQ1" target="_blank" rel="noopener" title="Telegram">
+            <svg viewBox="0 0 24 24" fill="none"><path d="M21.5 3L2.5 10.5L9 13L11.5 20L14.5 14.5L19.5 18L21.5 3Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M9 13L19.5 5" stroke="currentColor" stroke-width="1.7"/></svg>
+          </a>
+          <a class="icon-link" href="https://www.instagram.com/upskilling4life?igsh=MWRjeGMyb3FtOWdiYg==" target="_blank" rel="noopener" title="Instagram">
+            <svg viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="18" height="18" rx="5" stroke="currentColor" stroke-width="1.7"/><circle cx="12" cy="12" r="4" stroke="currentColor" stroke-width="1.7"/><circle cx="17.2" cy="6.8" r="1.1" fill="currentColor"/></svg>
+          </a>
+        </div>
+        <button class="mobile-toggle" onclick="toggleMobileMenu()" aria-label="Menu">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none"><path d="M4 6H20M4 12H20M4 18H20" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        </button>
+      </div>
+    </div>
+    <div class="mobile-menu" id="mobileMenu">
+      <button class="nav-btn" data-page="home">Home</button>
+      <button class="nav-btn" data-page="electives">Electives</button>
+      <button class="nav-btn" data-page="about">About</button>
+      <button class="nav-btn" data-page="community">Community</button>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <!-- ============ HOME ============ -->
+  <section id="home" class="active">
+    <div class="hero">
+      <div class="hero-tag"><span class="dot"></span> A student project for SP</div>
+      <h1>Skills your<br>diploma won't<br>hand you — <span class="hl">find them here.</span></h1>
+      <p class="hero-sub">Upskillingz is a friendly front door to electives across Singapore's polytechnics: the modules, minors and certificates that let you learn something outside your own course. Browse, filter, and go claim your slot.</p>
+      <div class="hero-actions">
+        <button class="btn btn-primary" onclick="goTo('electives')">Browse electives →</button>
+        <a class="btn btn-ghost" href="https://t.me/+BRFFAhOUh6MyZDQ1" target="_blank" rel="noopener">Join our Telegram</a>
+        <a class="btn btn-ghost" href="https://www.instagram.com/upskilling4life?igsh=MWRjeGMyb3FtOWdiYg==" target="_blank" rel="noopener">Follow on Instagram</a>
+      </div>
+      <div class="stat-row">
+        <div class="stat"><b>3</b><span>Polytechnics listed so far — SP, NYP &amp; RP</span></div>
+        <div class="stat"><b>16+</b><span>Interest areas, from data science to maritime studies</span></div>
+        <div class="stat"><b>NP / TP</b><span>No listing yet — ask in our Telegram instead</span></div>
+      </div>
+    </div>
+
+    <div class="section-head">
+      <div><span class="eyebrow">Why this exists</span><h2>Course-bound doesn't<br>have to mean skill-bound.</h2></div>
+    </div>
+    <div class="why-grid">
+      <div class="why-card">
+        <span class="num">01</span>
+        <h3>The listing's there, but it's easy to miss</h3>
+        <p>SP already publishes electives — but most students find out about them by accident, late in their diploma, if at all.</p>
+      </div>
+      <div class="why-card">
+        <span class="num">02</span>
+        <h3>Electives are the easiest way out of your lane</h3>
+        <p>You don't need to change course to learn UX, data, sustainability or maritime skills. Electives are already built for that.</p>
+      </div>
+      <div class="why-card">
+        <span class="num">03</span>
+        <h3>A push helps more than a portal</h3>
+        <p>We curate, tag and surface electives in a way that's actually browsable — then point you to SP to confirm and register.</p>
+      </div>
+    </div>
+
+    <div class="cta-band">
+      <div>
+        <h2>Ready to see what's out there?</h2>
+        <p>Search by interest, filter by school, and jump straight to SP's official listing when you've found something worth a shot.</p>
+      </div>
+      <div class="cta-actions">
+        <button class="btn btn-lime" onclick="goTo('electives')">Explore electives</button>
+        <a class="btn btn-ghost" href="#" onclick="goTo('community'); return false;">Get involved</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ ELECTIVES ============ -->
+  <section id="electives">
+    <div class="page-head">
+      <span class="eyebrow">The repository</span>
+      <h1>Find your next elective.</h1>
+      <p>A curated, browsable set of electives across SP, NYP and RP — search by keyword, or filter by polytechnic, school and interest area. Every card links back to the official listing for full, up-to-date details. Studying at NP or TP? We don't have a direct listing for those yet — our Telegram is the best place to crowdsource opinions.</p>
+    </div>
+
+    <div class="source-note">
+      📌 This is a curated sample set for browsing by category, built around each school's official interest areas and departments — not a live feed. Always confirm on the official source before registering:
+      <a href="https://www.sp.edu.sg/courses/poly-wide-curriculum/electives-minors-and-certificates/elective-module-listing" target="_blank" rel="noopener">SP ↗</a> ·
+      <a href="https://mynypportal.nyp.edu.sg/content/dam/nyp-sp/gsm/materials/AY2026-S1_yr1_LPUs_keytopics.pdf" target="_blank" rel="noopener">NYP ↗</a> ·
+      <a href="https://www.rp.edu.sg/education/modules/" target="_blank" rel="noopener">RP ↗</a>
+    </div>
+
+    <div class="filter-block">
+      <span class="filter-label">Polytechnic</span>
+      <div class="chip-row" id="polyChips"></div>
+    </div>
+
+    <div class="search-bar">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"/><path d="M21 21L16.65 16.65" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      <input id="searchInput" type="text" placeholder="Search electives — try 'data', 'design', 'music'...">
+      <button class="search-clear-btn" onclick="clearFilters()">Clear all</button>
+    </div>
+
+    <div id="filterPanel">
+      <div class="filter-block">
+        <span class="filter-label" id="secondaryFilterLabel">School / Department</span>
+        <div class="chip-row" id="schoolChips"></div>
+      </div>
+      <div class="filter-block">
+        <span class="filter-label">Interest area</span>
+        <div class="chip-row" id="interestChips"></div>
+      </div>
+
+      <div class="results-meta" id="resultsMeta"></div>
+      <div class="card-grid" id="cardGrid"></div>
+      <div class="empty-state" id="emptyState" style="display:none;">
+        <h3>No matches in the sample set</h3>
+        <p>Try clearing your filters, or head straight to the full official listing for this polytechnic.</p>
+        <a class="btn btn-primary" id="emptyStateLink" href="https://www.sp.edu.sg/courses/poly-wide-curriculum/electives-minors-and-certificates/elective-module-listing" target="_blank" rel="noopener">View official listing ↗</a>
+      </div>
+    </div>
+
+    <div class="empty-state" id="noListingState" style="display:none; border-color:var(--cobalt); background:#E9EDFF;">
+      <h3 id="noListingTitle">We don't have a listing for this school yet</h3>
+      <p id="noListingCopy">We don't have a direct electives listing for this polytechnic yet. Your best bet right now: ask in our Telegram channel — other students there can point you to what's worth taking.</p>
+      <a class="btn btn-primary" href="https://t.me/+BRFFAhOUh6MyZDQ1" target="_blank" rel="noopener">Ask in our Telegram →</a>
+    </div>
+
+    <div class="full-listing-cta" id="fullListingCta">
+      <div>
+        <h3 id="fullListingTitle">This is a taste, not the full menu.</h3>
+        <p id="fullListingCopy">Each school updates its official listing every semester with the complete, registration-ready set of electives.</p>
+      </div>
+      <a class="btn btn-lime" id="fullListingLink" href="https://www.sp.edu.sg/courses/poly-wide-curriculum/electives-minors-and-certificates/elective-module-listing" target="_blank" rel="noopener">View full official listing →</a>
+    </div>
+  </section>
+
+  <!-- ============ ABOUT ============ -->
+  <section id="about">
+    <div class="about-hero">
+      <span class="eyebrow">About Upskillingz</span>
+      <h1 style="font-size:clamp(34px,5vw,52px); margin-bottom:22px;">Why we built this</h1>
+      <p class="about-lead">Our starting question: <span class="hl">how can polytechnics encourage students to learn skills outside their own course?</span> Upskillingz is our answer — a small, student-run project to make that first step easier.</p>
+    </div>
+
+    <div class="about-grid">
+      <div>
+        <h3>The problem</h3>
+        <p>Every polytechnic student's timetable is built around one diploma. But the skills that make you stand out — a bit of data analysis, a design elective, a language, a maritime module — often live outside it, in each school's own elective system.</p>
+        <p>The information exists. SP, NYP and RP each publish their own elective or module listing every semester. The problem isn't access — it's discovery. Most students never browse it, don't know what's in it, find it late, or don't even know their own school has one.</p>
+        <h3 style="margin-top:34px;">What we're doing about it</h3>
+        <p>Upskillingz curates those listings into something a student would actually scroll through: tagged by interest, filterable by polytechnic and school, written in plain language instead of course-catalogue speak — then points straight back to the official source to confirm and register.</p>
+        <p>We're not replacing any school's system. We're the on-ramp to it — a nudge, a Telegram channel, an Instagram post at the right moment, so more students actually take the step. For NP and TP, we don't have a listing to point to yet, so our Telegram channel is where students crowdsource opinions on those electives instead.</p>
+      </div>
+      <div>
+        <div class="fact-card">
+          <b>SP · NYP · RP</b>
+          <span>Polytechnics with a curated elective listing on Upskillingz today</span>
+        </div>
+        <div class="fact-card">
+          <b>NP · TP</b>
+          <span>No listing yet — join the Telegram to ask other students directly</span>
+        </div>
+        <div class="fact-card">
+          <b>2 semesters a year</b>
+          <span>New elective runs — new chances to pick something outside your course</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-head" style="margin-top:20px;">
+      <div><span class="eyebrow">What we believe</span><h2>Three ideas behind the project</h2></div>
+    </div>
+    <ul class="value-list">
+      <li>
+        <div class="v-mark">1</div>
+        <div><h4>Skills compound outside your lane</h4><p>The most useful thing you learn in poly might not be on your own course outline.</p></div>
+      </li>
+      <li>
+        <div class="v-mark">2</div>
+        <div><h4>Discovery is the real barrier</h4><p>Students don't skip electives because they don't care — they skip them because they didn't know, or didn't look in time.</p></div>
+      </li>
+      <li>
+        <div class="v-mark">3</div>
+        <div><h4>Peer-to-peer beats top-down</h4><p>A recommendation from another student in a Telegram chat travels further than a line in a handbook.</p></div>
+      </li>
+    </ul>
+  </section>
+
+  <!-- ============ COMMUNITY ============ -->
+  <section id="community">
+    <div class="comm-hero">
+      <span class="eyebrow">Get involved</span>
+      <h1>Where the word actually gets out.</h1>
+      <p>This project only works if students hear about it. Join the channel, follow the page — and tell a course-mate who's been meaning to try something new.</p>
+    </div>
+
+    <div class="comm-grid">
+      <div class="comm-card tg">
+        <div class="comm-icon">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M21.5 3L2.5 10.5L9 13L11.5 20L14.5 14.5L19.5 18L21.5 3Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M9 13L19.5 5" stroke="currentColor" stroke-width="1.7"/></svg>
+        </div>
+        <h3>Join our Telegram</h3>
+        <p>Updates on new elective runs, honest student takes, and a place to ask "is this module actually worth it?" before you commit.</p>
+        <a class="btn btn-primary btn-sm" href="https://t.me/+BRFFAhOUh6MyZDQ1" target="_blank" rel="noopener">Join the channel →</a>
+      </div>
+      <div class="comm-card ig">
+        <div class="comm-icon">
+          <svg viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="18" height="18" rx="5" stroke="currentColor" stroke-width="1.7"/><circle cx="12" cy="12" r="4" stroke="currentColor" stroke-width="1.7"/><circle cx="17.2" cy="6.8" r="1.1" fill="currentColor"/></svg>
+        </div>
+        <h3>Follow on Instagram</h3>
+        <p>Bite-sized elective spotlights, deadline reminders, and campus updates — the stuff you'll actually stop scrolling for.</p>
+        <a class="btn btn-primary btn-sm" href="https://www.instagram.com/upskilling4life?igsh=MWRjeGMyb3FtOWdiYg==" target="_blank" rel="noopener">Follow @upskilling4life →</a>
+      </div>
+    </div>
+
+    <div class="quote-block">
+      <p>"The best elective is the one you actually find out about in time to register for it."</p>
+      <span>— why this project exists</span>
+    </div>
+
+    <div class="full-listing-cta">
+      <div>
+        <h3>Know someone still stuck in just their own course?</h3>
+        <p>Share this page, or send them straight to the Telegram channel.</p>
+      </div>
+      <button class="btn btn-lime" onclick="goTo('electives')">Send them to the electives page →</button>
+    </div>
+  </section>
+
+  <!-- ============ ADMIN / MODERATION (unlisted — linked only from footer) ============ -->
+  <section id="admin">
+    <div class="page-head">
+      <span class="eyebrow">Moderator tools</span>
+      <h1>Review comments</h1>
+      <p>Approve genuine student comments, and remove anything vulgar, spammy, or off-topic. Not linked from the main nav — keep this URL to yourself.</p>
+    </div>
+
+    <div class="admin-gate" id="adminGate">
+      <p style="color:var(--ink-soft); font-size:14px;">Enter the moderator password to continue.</p>
+      <input type="password" id="adminPassInput" placeholder="Moderator password">
+      <button class="btn btn-primary" onclick="checkAdminPass()">Unlock</button>
+      <p id="adminGateMsg" class="comment-form-msg err"></p>
+    </div>
+
+    <div id="adminPanel" style="display:none;">
+      <div class="filter-block">
+        <span class="filter-label">Pending review</span>
+      </div>
+      <div class="admin-list" id="adminPendingList"></div>
+
+      <div class="filter-block" style="margin-top:40px;">
+        <span class="filter-label">Approved (visible on site)</span>
+      </div>
+      <div class="admin-list" id="adminApprovedList"></div>
+    </div>
+  </section>
+
+</main>
+
+<!-- ============ RATING & COMMENT MODAL ============ -->
+<div class="modal-overlay" id="feedbackModal">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeFeedback()">✕</button>
+    <div class="modal-tags" id="modalTags"></div>
+    <h3 id="modalTitle"></h3>
+    <p class="modal-sub" id="modalSub"></p>
+
+    <div class="rate-row">
+      <div>
+        <div class="star-input" id="starInput">
+          <button data-v="1">★</button><button data-v="2">★</button><button data-v="3">★</button><button data-v="4">★</button><button data-v="5">★</button>
+        </div>
+        <div class="rate-avg" id="modalAvg">No ratings yet</div>
+      </div>
+    </div>
+
+    <div class="comment-form">
+      <input type="text" id="commentName" placeholder="Name or handle (optional)" maxlength="40">
+      <textarea id="commentText" placeholder="Share a quick, honest take on this elective..." maxlength="400"></textarea>
+      <div style="display:flex; justify-content:flex-end; margin-top:10px;">
+        <button class="btn btn-primary btn-sm" onclick="submitComment()">Post comment</button>
+      </div>
+      <p class="comment-form-msg" id="commentMsg"></p>
+    </div>
+
+    <div class="comment-list" id="commentList"></div>
+  </div>
+</div>
+
+  <div class="wrap">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <div class="brand"><div class="brand-mark"><span>U</span></div><div class="brand-name">UPSKILLING<em>Z</em></div></div>
+        <p>A student project making SP's electives easier to find — so more students learn skills outside their own course.</p>
+      </div>
+      <div class="footer-cols">
+        <div class="footer-col">
+          <h4>Site</h4>
+          <a href="#" onclick="goTo('home'); return false;">Home</a>
+          <a href="#" onclick="goTo('electives'); return false;">Electives</a>
+          <a href="#" onclick="goTo('about'); return false;">About</a>
+        </div>
+        <div class="footer-col">
+          <h4>Community</h4>
+          <a href="https://t.me/+BRFFAhOUh6MyZDQ1" target="_blank" rel="noopener">Telegram</a>
+          <a href="https://www.instagram.com/upskilling4life?igsh=MWRjeGMyb3FtOWdiYg==" target="_blank" rel="noopener">Instagram</a>
+        </div>
+        <div class="footer-col">
+          <h4>Official listings</h4>
+          <a href="https://www.sp.edu.sg/courses/poly-wide-curriculum/electives-minors-and-certificates/elective-module-listing" target="_blank" rel="noopener">SP Elective Listing ↗</a>
+          <a href="https://mynypportal.nyp.edu.sg/content/dam/nyp-sp/gsm/materials/AY2026-S1_yr1_LPUs_keytopics.pdf" target="_blank" rel="noopener">NYP Year 1 LPUs ↗</a>
+          <a href="https://www.rp.edu.sg/education/modules/" target="_blank" rel="noopener">RP Modules ↗</a>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>Not an official site of SP, NYP, RP, NP or TP. Always verify module info on each school's own official listing before registering. · <a href="#" onclick="goTo('admin'); return false;" style="font-weight:400; text-decoration:underline;">Moderator login</a></span>
+      <div class="footer-socials">
+        <a class="icon-link" href="https://t.me/+BRFFAhOUh6MyZDQ1" target="_blank" rel="noopener" title="Telegram" style="width:32px;height:32px;">
+          <svg viewBox="0 0 24 24" width="15" height="15" fill="none"><path d="M21.5 3L2.5 10.5L9 13L11.5 20L14.5 14.5L19.5 18L21.5 3Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M9 13L19.5 5" stroke="currentColor" stroke-width="1.7"/></svg>
+        </a>
+        <a class="icon-link" href="https://www.instagram.com/upskilling4life?igsh=MWRjeGMyb3FtOWdiYg==" target="_blank" rel="noopener" title="Instagram" style="width:32px;height:32px;">
+          <svg viewBox="0 0 24 24" width="15" height="15" fill="none"><rect x="3" y="3" width="18" height="18" rx="5" stroke="currentColor" stroke-width="1.7"/><circle cx="12" cy="12" r="4" stroke="currentColor" stroke-width="1.7"/><circle cx="17.2" cy="6.8" r="1.1" fill="currentColor"/></svg>
+        </a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+// ---------- Navigation ----------
+function goTo(page){
+  document.querySelectorAll('section').forEach(s => s.classList.remove('active'));
+  document.getElementById(page).classList.add('active');
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.toggle('active', b.dataset.page === page));
+  document.getElementById('mobileMenu').classList.remove('open');
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+document.querySelectorAll('.nav-btn[data-page]').forEach(btn => {
+  btn.addEventListener('click', () => goTo(btn.dataset.page));
+});
+document.querySelector('.nav-btn[data-page="home"]').classList.add('active');
+
+function toggleMobileMenu(){
+  document.getElementById('mobileMenu').classList.toggle('open');
+}
+
+// ---------- Polytechnic config ----------
+const POLYS = {
+  ALL: {label:'All schools', color:'#16172B', hasListing:true, source:'—'},
+  SP:  {label:'SP',  color:'#3542FF', hasListing:true,
+        source:'https://www.sp.edu.sg/courses/poly-wide-curriculum/electives-minors-and-certificates/elective-module-listing', sourceLabel:"SP's official Elective Module Listing"},
+  NYP: {label:'NYP', color:'#00A67E', hasListing:true,
+        source:'https://mynypportal.nyp.edu.sg/content/dam/nyp-sp/gsm/materials/AY2026-S1_yr1_LPUs_keytopics.pdf', sourceLabel:"NYP's Year 1 Learning Unit key topics list"},
+  RP:  {label:'RP',  color:'#E8552B', hasListing:true,
+        source:'https://www.rp.edu.sg/education/modules/', sourceLabel:"RP's official Modules directory"},
+  NP:  {label:'NP',  color:'#9C4DFF', hasListing:false},
+  TP:  {label:'TP',  color:'#D6336C', hasListing:false},
+};
+
+// ---------- Elective data (illustrative sample set, mapped to each school's own official categories) ----------
+const MODULES = [
+  // ---- SP ----
+  {poly:'SP', code:'ELE-DS101', name:'Intro to Data Storytelling', school:'School of Mathematical Sciences & Analytics', interest:'Data Science', desc:'Turn raw datasets into visuals and narratives non-analysts can actually act on.'},
+  {poly:'SP', code:'ELE-CMP204', name:'Foundations of UX Design', school:'School of Computing', interest:'Design & Innovation', desc:'User research, wireframing and usability testing for digital products.'},
+  {poly:'SP', code:'ELE-BUS110', name:'Startup Fundamentals', school:'School of Business', interest:'Business & Management', desc:'Validate an idea, build a lean business model, and pitch it with confidence.'},
+  {poly:'SP', code:'ELE-MAD305', name:'Digital Illustration Studio', school:'Media, Arts & Design School', interest:'Art & Design', desc:'Build a personal illustration style using industry-standard digital tools.'},
+  {poly:'SP', code:'ELE-EEE212', name:'Smart City Sensors & IoT', school:'School of Electrical & Electronic Engineering', interest:'Smart City and Mobility', desc:'Prototype connected sensors for real urban problems, from traffic to energy.'},
+  {poly:'SP', code:'ELE-LSC101', name:'Conversational Mandarin for Work', school:'School of Life Skills & Communication', interest:'Internationalisation', desc:'Workplace-ready Mandarin for cross-border teams and client conversations.'},
+  {poly:'SP', code:'ELE-CLS208', name:'Sustainable Materials Lab', school:'School of Chemical & Life Sciences', interest:'Sustainability', desc:'Hands-on work with biodegradable and low-impact materials in a lab setting.'},
+  {poly:'SP', code:'ELE-MAE150', name:'Intro to Robotics & Automation', school:'School of Mechanical & Aeronautical Engineering', interest:'Manufacturing & Automation', desc:'Build and program a basic robotic arm from first principles.'},
+  {poly:'SP', code:'ELE-SMA101', name:'Life at Sea: Maritime Fundamentals', school:'Singapore Maritime Academy', interest:'Maritime Studies', desc:'A first look at maritime operations, safety and the shipping industry.'},
+  {poly:'SP', code:'ELE-MAD210', name:'Sound Design & Audio Production', school:'Media, Arts & Design School', interest:'Music and Audio', desc:'Record, mix and produce audio for film, games and podcasts.'},
+  {poly:'SP', code:'ELE-ABE140', name:'Sustainable Building Design', school:'School of Architecture & The Built Environment', interest:'Sustainability', desc:'Low-carbon design principles applied to real built-environment case studies.'},
+  {poly:'SP', code:'ELE-CMP330', name:'Applied Machine Learning', school:'School of Computing', interest:'Data Science', desc:'Train and evaluate ML models on real datasets, no PhD required.'},
+  {poly:'SP', code:'ELE-LSC220', name:'Psychology of Everyday Decisions', school:'School of Life Skills & Communication', interest:'Psychology', desc:'How cognitive bias shapes choices — and how to design around it.'},
+  {poly:'SP', code:'ELE-BUS215', name:'Social Media & Content Strategy', school:'School of Business', interest:'Digital Media', desc:'Plan, create and measure content that actually builds an audience.'},
+  {poly:'SP', code:'ELE-MSA190', name:'Preparatory Maths for University', school:'School of Mathematical Sciences & Analytics', interest:'Preparatory Mathematics and Physics for University', desc:'Bridge the gap before an engineering or science degree pathway.'},
+  {poly:'SP', code:'ELE-EEE270', name:'Aerospace Systems Primer', school:'School of Electrical & Electronic Engineering', interest:'Aerospace', desc:'An entry point into avionics, flight systems and aerospace fundamentals.'},
+  {poly:'SP', code:'ELE-FAB101', name:'Rapid Prototyping in the FabLab', school:'Fablab', interest:'Design & Innovation', desc:'3D printing, laser cutting and CNC basics to build your first physical prototype.'},
+  {poly:'SP', code:'ELE-MAD180', name:'Motion Graphics Basics', school:'Media, Arts & Design School', interest:'Digital Media', desc:'Animate type and shapes for social, brand and campaign work.'},
+
+  // ---- NYP (Year 1 Learning Units, AY2026 S1 — Centre for Innovation and Life Skills) ----
+  {poly:'NYP', code:'FGX124', name:'Sustainability: Building a Better World', school:'Centre for Innovation and Life Skills', interest:'Sustainability', desc:'Explore environmental, social and economic sustainability challenges and design practical solutions for a better future.', link:'https://mynypportal.nyp.edu.sg/content/dam/nyp-sp/gsm/materials/AY2026-S1_yr1_LPUs_keytopics.pdf'},
+  {poly:'NYP', code:'FGX125', name:'Introduction to French Language', school:'Centre for Innovation and Life Skills', interest:'Internationalisation', desc:'Pick up handy everyday French phrases for greetings, self-introductions and first conversations.', link:'https://mynypportal.nyp.edu.sg/content/dam/nyp-sp/gsm/materials/AY2026-S1_yr1_LPUs_keytopics.pdf'},
+  {poly:'NYP', code:'FGX126', name:'Introduction to German Language', school:'Centre for Innovation and Life Skills', interest:'Internationalisation', desc:'Learn basic German reading, writing and everyday conversation, from greetings to ordering food.', link:'https://mynypportal.nyp.edu.sg/content/dam/nyp-sp/gsm/materials/AY2026-S1_yr1_LPUs_keytopics.pdf'},
+  {poly:'NYP', code:'FGX127', name:'Introduction to Japanese Language', school:'Centre for Innovation and Life Skills', interest:'Internationalisation', desc:'Build confidence with basic Japanese pronunciation, writing systems and everyday phrases.', link:'https://mynypportal.nyp.edu.sg/content/dam/nyp-sp/gsm/materials/AY2026-S1_yr1_LPUs_keytopics.pdf'},
+  {poly:'NYP', code:'FGX128', name:'Introduction to Korean Language', school:'Centre for Innovation and Life Skills', interest:'Internationalisation', desc:'Learn the Korean alphabet and practise real-life phrases, from self-introductions to ordering food.', link:'https://mynypportal.nyp.edu.sg/content/dam/nyp-sp/gsm/materials/AY2026-S1_yr1_LPUs_keytopics.pdf'},
+  {poly:'NYP', code:'FGX129', name:'Discovering Vietnamese Culture & Society', school:'Centre for Innovation and Life Skills', interest:'Internationalisation', desc:'A cultural deep-dive into Vietnam\u2019s history, cuisine, festivals and everyday social life.', link:'https://mynypportal.nyp.edu.sg/content/dam/nyp-sp/gsm/materials/AY2026-S1_yr1_LPUs_keytopics.pdf'},
+  {poly:'NYP', code:'FGX130', name:'Discovering French Culture & Society', school:'Centre for Innovation and Life Skills', interest:'Internationalisation', desc:'Go beyond the language into French history, society, etiquette and everyday culture.', link:'https://mynypportal.nyp.edu.sg/content/dam/nyp-sp/gsm/materials/AY2026-S1_yr1_LPUs_keytopics.pdf'},
+  {poly:'NYP', code:'FGX131', name:'Discovering Korean Culture & Society', school:'Centre for Innovation and Life Skills', interest:'Internationalisation', desc:'Trace how Korea\u2019s history and traditions still shape everyday life, etiquette and cities today.', link:'https://mynypportal.nyp.edu.sg/content/dam/nyp-sp/gsm/materials/AY2026-S1_yr1_LPUs_keytopics.pdf'},
+
+  // ---- RP (sample from the Science category of RP's Modules directory) ----
+  {poly:'RP', code:'A103', name:'Anatomy and Physiology', school:'Science', interest:'Science', desc:'Explore how the human body is organised and how its biological systems work together.', link:'https://www.rp.edu.sg/education/modules/a103/'},
+  {poly:'RP', code:'A105', name:'General and Physical Chemistry', school:'Science', interest:'Science', desc:'Build a foundation in chemical principles, from atomic structure to how molecules interact.', link:'https://www.rp.edu.sg/education/modules/a105/'},
+  {poly:'RP', code:'A106', name:'Organic and Inorganic Chemistry', school:'Science', interest:'Science', desc:'Study the structure, properties and reactions of organic and inorganic compounds.', link:'https://www.rp.edu.sg/education/modules/a106/'},
+  {poly:'RP', code:'A109', name:'Laboratory Practices and Safety', school:'Science', interest:'Science', desc:'Learn workplace safety and health practices for lab and applied-science settings.', link:'https://www.rp.edu.sg/education/modules/a109/'},
+  {poly:'RP', code:'A110', name:'Molecular Cell Biology and Biochemistry', school:'Science', interest:'Science', desc:'Go deep into how cells function and interact at the molecular level.', link:'https://www.rp.edu.sg/education/modules/a110/'},
+  {poly:'RP', code:'A116', name:'Sustainability and Climate Change', school:'Science', interest:'Sustainability', desc:'Examine core sustainability principles and how they intersect with climate change.', link:'https://www.rp.edu.sg/education/modules/a116/'},
+  {poly:'RP', code:'A209', name:'Marine Ecology and Conservation', school:'Science', interest:'Sustainability', desc:'Look at how marine resources are used, and the biological approaches used to conserve them.', link:'https://www.rp.edu.sg/education/modules/a209/'},
+];
+
+let activePoly = 'ALL';
+let activeInterests = new Set();
+let activeSchools = new Set();
+
+function polysWithListingInScope(){
+  return activePoly === 'ALL' ? Object.keys(POLYS).filter(k => POLYS[k].hasListing && k !== 'ALL') : [activePoly];
+}
+
+function buildPolyChips(){
+  const wrap = document.getElementById('polyChips');
+  wrap.innerHTML = '';
+  Object.keys(POLYS).forEach(key => {
+    const p = POLYS[key];
+    const c = document.createElement('button');
+    c.className = 'chip poly-chip' + (key === activePoly ? ' active' : '');
+    c.textContent = p.label;
+    if(key === activePoly){ c.style.background = p.color; c.style.borderColor = p.color; }
+    c.onclick = () => {
+      activePoly = key;
+      activeInterests.clear(); activeSchools.clear();
+      document.getElementById('searchInput').value = '';
+      buildPolyChips();
+      buildSecondaryChips();
+      render();
+    };
+    wrap.appendChild(c);
+  });
+}
+
+function buildSecondaryChips(){
+  const scoped = activePoly === 'ALL' ? MODULES : MODULES.filter(m => m.poly === activePoly);
+  const schools = [...new Set(scoped.map(m => m.school))].sort();
+  const interests = [...new Set(scoped.map(m => m.interest))].sort();
+
+  document.getElementById('secondaryFilterLabel').textContent = activePoly === 'RP' ? 'Category' : 'School / Centre';
+
+  const sWrap = document.getElementById('schoolChips');
+  sWrap.innerHTML = '';
+  schools.forEach(s => {
+    const c = document.createElement('button');
+    c.className = 'chip'; c.textContent = s;
+    c.onclick = () => { toggleSet(activeSchools, s); c.classList.toggle('active'); render(); };
+    sWrap.appendChild(c);
+  });
+
+  const iWrap = document.getElementById('interestChips');
+  iWrap.innerHTML = '';
+  interests.forEach(i => {
+    const c = document.createElement('button');
+    c.className = 'chip'; c.textContent = i;
+    c.onclick = () => { toggleSet(activeInterests, i); c.classList.toggle('active'); render(); };
+    iWrap.appendChild(c);
+  });
+}
+
+function toggleSet(set, val){ set.has(val) ? set.delete(val) : set.add(val); }
+
+function clearFilters(){
+  activePoly = 'ALL';
+  activeInterests.clear(); activeSchools.clear();
+  document.getElementById('searchInput').value = '';
+  buildPolyChips();
+  buildSecondaryChips();
+  render();
+}
+
+function render(){
+  const noListingState = document.getElementById('noListingState');
+  const filterPanel = document.getElementById('filterPanel');
+  const fullListingCta = document.getElementById('fullListingCta');
+
+  // NP / TP: no listing yet — redirect to Telegram
+  if(activePoly === 'NP' || activePoly === 'TP'){
+    filterPanel.style.display = 'none';
+    fullListingCta.style.display = 'none';
+    noListingState.style.display = 'block';
+    document.getElementById('noListingTitle').textContent = `We don't have a listing for ${POLYS[activePoly].label} yet`;
+    document.getElementById('noListingCopy').textContent = `We don't have a direct electives listing for ${POLYS[activePoly].label} yet. Your best bet right now: ask in our Telegram channel — other ${POLYS[activePoly].label} students there can share what's worth taking.`;
+    return;
+  }
+  noListingState.style.display = 'none';
+  filterPanel.style.display = 'block';
+  fullListingCta.style.display = 'flex';
+
+  const q = document.getElementById('searchInput').value.trim().toLowerCase();
+  const scoped = activePoly === 'ALL' ? MODULES : MODULES.filter(m => m.poly === activePoly);
+  const filtered = scoped.filter(m => {
+    const matchesQuery = !q || (m.name + m.desc + m.school + m.interest).toLowerCase().includes(q);
+    const matchesInterest = activeInterests.size === 0 || activeInterests.has(m.interest);
+    const matchesSchool = activeSchools.size === 0 || activeSchools.has(m.school);
+    return matchesQuery && matchesInterest && matchesSchool;
+  });
+
+  const grid = document.getElementById('cardGrid');
+  const empty = document.getElementById('emptyState');
+  const meta = document.getElementById('resultsMeta');
+  meta.textContent = `Showing ${filtered.length} of ${scoped.length} sample electives${activePoly !== 'ALL' ? ' — ' + POLYS[activePoly].label : ' across SP, NYP & RP'}`;
+
+  // update the "view official listing" links to match scope
+  const scopePolys = polysWithListingInScope();
+  const primarySource = POLYS[scopePolys[0]] || POLYS.SP;
+  document.getElementById('emptyStateLink').href = primarySource.source;
+  document.getElementById('fullListingLink').href = primarySource.source;
+  document.getElementById('fullListingTitle').textContent = activePoly === 'ALL'
+    ? 'This is a taste, not the full menu.'
+    : `This is a taste of ${POLYS[activePoly].label}'s electives, not the full menu.`;
+  document.getElementById('fullListingCopy').textContent = activePoly === 'ALL'
+    ? 'Each school updates its official listing every semester with the complete, registration-ready set of electives.'
+    : `Check ${primarySource.sourceLabel} for the complete, registration-ready set.`;
+
+  if(filtered.length === 0){
+    grid.innerHTML = '';
+    empty.style.display = 'block';
+    return;
+  }
+  empty.style.display = 'none';
+  grid.innerHTML = filtered.map(m => {
+    const poly = POLYS[m.poly];
+    const link = m.link || poly.source;
+    const modId = `${m.poly}-${m.code}`;
+    return `
+    <div class="mod-card">
+      <div class="mod-card-top">
+        <div class="mod-tags">
+          <span class="tag-poly" style="background:${poly.color}">${poly.label}</span>
+          <span class="tag-school">${m.school.replace('School of ', '')}</span>
+          <span class="tag-interest">${m.interest}</span>
+        </div>
+        <h3>${m.name}</h3>
+        <p>${m.desc}</p>
+        <button class="rate-btn" data-modid="${modId}" onclick="openFeedback('${m.poly}','${m.code.replace(/'/g,"\\'")}')">
+          ⭐ Rate &amp; discuss <span class="stars-display" id="stars-${modId}">loading…</span>
+        </button>
+      </div>
+      <div class="mod-card-bottom">
+        <span class="mod-code">${m.code}</span>
+        <a class="mod-link" href="${link}" target="_blank" rel="noopener">Check on ${poly.label} ↗</a>
+      </div>
+    </div>
+  `;
+  }).join('');
+  filtered.forEach(m => loadStarSummary(`${m.poly}-${m.code}`));
+}
+
+document.getElementById('searchInput').addEventListener('input', render);
+
+buildPolyChips();
+buildSecondaryChips();
+render();
+
+// ================= RATINGS & COMMENTS (Firebase Firestore) =================
+// 1. Create a free project at https://console.firebase.google.com
+// 2. Enable "Firestore Database" (start in production mode)
+// 3. Project settings → General → Your apps → Web app → copy the config below
+// 4. Paste your real values into firebaseConfig, replacing the placeholders
+// 5. In Firestore → Rules, paste the rules from the README/setup notes provided alongside this file
+const firebaseConfig = {
+  apiKey: "YOUR_API_KEY",
+  authDomain: "YOUR_PROJECT.firebaseapp.com",
+  projectId: "YOUR_PROJECT_ID",
+  storageBucket: "YOUR_PROJECT.appspot.com",
+  messagingSenderId: "YOUR_SENDER_ID",
+  appId: "YOUR_APP_ID"
+};
+
+let db = null;
+let feedbackReady = false;
+try {
+  firebase.initializeApp(firebaseConfig);
+  db = firebase.firestore();
+  feedbackReady = true;
+} catch(e) {
+  console.warn('Ratings & comments are not configured yet — add your Firebase config to enable them.');
+}
+
+// Change this before you go live. This is a light UI gate, not real database security —
+// see the setup notes for how comment moderation is actually protected in Firestore rules.
+const ADMIN_PASSWORD = "changeme123";
+
+// ---------- Basic profanity / spam filter ----------
+const BANNED_WORDS = ["fuck","shit","bitch","asshole","cunt","dick","bastard","slut","whore","nigger","retard"];
+function moderateText(text){
+  const t = text.trim();
+  if(t.length < 3) return "Comment's too short — add a bit more detail.";
+  if(t.length > 400) return "Keep it under 400 characters.";
+  const lower = t.toLowerCase();
+  if(BANNED_WORDS.some(w => lower.includes(w))) return "Please keep comments respectful — no vulgar language.";
+  const linkCount = (t.match(/https?:\/\//g) || []).length;
+  if(linkCount > 0) return "Links aren't allowed in comments.";
+  const capsRatio = (t.replace(/[^A-Z]/g,'').length) / Math.max(1, t.replace(/[^A-Za-z]/g,'').length);
+  if(t.length > 12 && capsRatio > 0.7) return "Try turning off caps lock — comments in all caps read as spam.";
+  if(/(.)\1{5,}/.test(t)) return "That looks like spam (too many repeated characters).";
+  return null; // passes
+}
+
+// simple per-browser rate limit so one person can't spam repeatedly
+function tooSoonSinceLastComment(){
+  const last = localStorage.getItem('upskillingz_last_comment');
+  if(!last) return false;
+  return (Date.now() - parseInt(last,10)) < 30000; // 30s cooldown
+}
+
+// ---------- Star summary on cards ----------
+async function loadStarSummary(modId){
+  const el = document.getElementById(`stars-${modId}`);
+  if(!el) return;
+  if(!feedbackReady){ el.textContent = 'sign in to rate'; return; }
+  try{
+    const snap = await db.collection('ratings').where('moduleId','==', modId).get();
+    if(snap.empty){ el.innerHTML = 'Be the first to rate'; return; }
+    let sum = 0; snap.forEach(d => sum += d.data().stars);
+    const avg = (sum / snap.size).toFixed(1);
+    el.innerHTML = `<span class="star">★</span> ${avg} (${snap.size})`;
+  } catch(e){ el.textContent = ''; }
+}
+
+// ---------- Modal ----------
+let currentModId = null, currentModName = null, currentStars = 0;
+function findModule(poly, code){ return MODULES.find(m => m.poly === poly && m.code === code); }
+
+function openFeedback(poly, code){
+  const m = findModule(poly, code);
+  if(!m) return;
+  currentModId = `${poly}-${code}`;
+  currentModName = m.name;
+  currentStars = 0;
+  const p = POLYS[poly];
+  document.getElementById('modalTags').innerHTML = `<span class="tag-poly" style="background:${p.color}">${p.label}</span><span class="tag-school">${m.school.replace('School of ','')}</span>`;
+  document.getElementById('modalTitle').textContent = m.name;
+  document.getElementById('modalSub').textContent = m.desc;
+  document.getElementById('commentName').value = '';
+  document.getElementById('commentText').value = '';
+  document.getElementById('commentMsg').textContent = '';
+  document.querySelectorAll('#starInput button').forEach(b => b.classList.remove('filled'));
+  document.getElementById('modalAvg').textContent = 'Loading...';
+  document.getElementById('commentList').innerHTML = '<p class="comment-empty">Loading comments...</p>';
+  document.getElementById('feedbackModal').classList.add('open');
+  if(feedbackReady){ loadModalAvg(); loadComments(); }
+  else {
+    document.getElementById('modalAvg').textContent = 'Ratings not set up yet';
+    document.getElementById('commentList').innerHTML = '<p class="comment-empty">Comments aren\'t connected yet — see setup notes.</p>';
+  }
+}
+function closeFeedback(){ document.getElementById('feedbackModal').classList.remove('open'); }
+
+document.querySelectorAll('#starInput button').forEach(btn => {
+  btn.addEventListener('click', () => {
+    currentStars = parseInt(btn.dataset.v, 10);
+    document.querySelectorAll('#starInput button').forEach(b => b.classList.toggle('filled', parseInt(b.dataset.v,10) <= currentStars));
+    submitRating();
+  });
+});
+
+async function loadModalAvg(){
+  const snap = await db.collection('ratings').where('moduleId','==', currentModId).get();
+  if(snap.empty){ document.getElementById('modalAvg').textContent = 'No ratings yet — be the first'; return; }
+  let sum = 0; snap.forEach(d => sum += d.data().stars);
+  document.getElementById('modalAvg').textContent = `${(sum/snap.size).toFixed(1)} ★ average from ${snap.size} rating${snap.size===1?'':'s'}`;
+}
+
+async function submitRating(){
+  if(!feedbackReady || !currentStars) return;
+  try{
+    await db.collection('ratings').add({ moduleId: currentModId, stars: currentStars, ts: Date.now() });
+    loadModalAvg();
+    loadStarSummary(currentModId);
+  } catch(e){ console.error(e); }
+}
+
+async function loadComments(){
+  const list = document.getElementById('commentList');
+  try{
+    const snap = await db.collection('comments')
+      .where('moduleId','==', currentModId)
+      .where('status','==','approved')
+      .get();
+    if(snap.empty){ list.innerHTML = '<p class="comment-empty">No comments yet — be the first to share a take.</p>'; return; }
+    const items = [];
+    snap.forEach(d => items.push(d.data()));
+    items.sort((a,b) => b.ts - a.ts);
+    list.innerHTML = items.map(c => `
+      <div class="comment-item">
+        <div class="c-head"><span>${escapeHtml(c.name || 'Anonymous student')}</span><span>${new Date(c.ts).toLocaleDateString()}</span></div>
+        <p>${escapeHtml(c.text)}</p>
+      </div>
+    `).join('');
+  } catch(e){ list.innerHTML = '<p class="comment-empty">Couldn\'t load comments right now.</p>'; }
+}
+
+function escapeHtml(str){
+  const d = document.createElement('div'); d.textContent = str; return d.innerHTML;
+}
+
+async function submitComment(){
+  const msgEl = document.getElementById('commentMsg');
+  const nameEl = document.getElementById('commentName');
+  const textEl = document.getElementById('commentText');
+  msgEl.className = 'comment-form-msg';
+
+  if(!feedbackReady){ msgEl.textContent = 'Comments aren\'t set up yet.'; msgEl.classList.add('err'); return; }
+  if(tooSoonSinceLastComment()){ msgEl.textContent = 'Please wait a bit before posting again.'; msgEl.classList.add('err'); return; }
+
+  const problem = moderateText(textEl.value);
+  if(problem){ msgEl.textContent = problem; msgEl.classList.add('err'); return; }
+
+  try{
+    await db.collection('comments').add({
+      moduleId: currentModId,
+      name: (nameEl.value || '').trim().slice(0,40),
+      text: textEl.value.trim(),
+      status: 'pending',
+      ts: Date.now()
+    });
+    localStorage.setItem('upskillingz_last_comment', Date.now().toString());
+    textEl.value = ''; nameEl.value = '';
+    msgEl.textContent = 'Thanks! Your comment will show once a moderator approves it.';
+    msgEl.classList.add('ok');
+  } catch(e){ msgEl.textContent = 'Something went wrong — try again.'; msgEl.classList.add('err'); }
+}
+
+// ---------- Admin / moderation panel ----------
+function checkAdminPass(){
+  const val = document.getElementById('adminPassInput').value;
+  if(val === ADMIN_PASSWORD){
+    document.getElementById('adminGate').style.display = 'none';
+    document.getElementById('adminPanel').style.display = 'block';
+    loadAdminComments();
+  } else {
+    document.getElementById('adminGateMsg').textContent = 'Wrong password.';
+  }
+}
+
+async function loadAdminComments(){
+  const pendingEl = document.getElementById('adminPendingList');
+  const approvedEl = document.getElementById('adminApprovedList');
+  pendingEl.innerHTML = '<p class="comment-empty">Loading...</p>';
+  approvedEl.innerHTML = '';
+  if(!feedbackReady){ pendingEl.innerHTML = '<p class="comment-empty">Comments aren\'t set up yet — add your Firebase config first.</p>'; return; }
+
+  const snap = await db.collection('comments').get();
+  const all = []; snap.forEach(d => all.push({id:d.id, ...d.data()}));
+  all.sort((a,b) => b.ts - a.ts);
+
+  const pending = all.filter(c => c.status === 'pending');
+  const approved = all.filter(c => c.status === 'approved');
+
+  pendingEl.innerHTML = pending.length ? pending.map(adminItemHtml).join('') : '<p class="comment-empty">No comments waiting for review 🎉</p>';
+  approvedEl.innerHTML = approved.length ? approved.map(adminItemHtml).join('') : '<p class="comment-empty">Nothing approved yet.</p>';
+}
+
+function adminItemHtml(c){
+  return `
+    <div class="admin-item">
+      <div class="a-head">
+        <span>${escapeHtml(c.name || 'Anonymous')} · ${c.moduleId} · ${new Date(c.ts).toLocaleString()}</span>
+        <span class="status-pill ${c.status}">${c.status}</span>
+      </div>
+      <p>${escapeHtml(c.text)}</p>
+      <div class="admin-actions">
+        ${c.status === 'pending' ? `<button class="btn-approve" onclick="approveComment('${c.id}')">Approve</button>` : ''}
+        <button class="btn-reject" onclick="deleteComment('${c.id}')">Delete</button>
+      </div>
+    </div>`;
+}
+
+async function approveComment(id){
+  await db.collection('comments').doc(id).update({status:'approved'});
+  loadAdminComments();
+}
+async function deleteComment(id){
+  await db.collection('comments').doc(id).delete();
+  loadAdminComments();
+}
+
+</script>
+
+</body>
+</html>
