@@ -389,6 +389,52 @@
   .status-pill{font-family:'IBM Plex Mono'; font-size:10px; text-transform:uppercase; padding:2px 8px; border-radius:5px;}
   .status-pill.pending{background:#FFF3C4;}
   .status-pill.approved{background:#D8FF5C;}
+
+  /* ---------- Modal Tabs ---------- */
+  .modal-tabbar{display:flex; gap:4px; border-bottom:2px solid var(--ink); margin:18px 0 20px; overflow-x:auto;}
+  .modal-tab{
+    padding:9px 14px; font-size:13px; font-weight:700; background:transparent; border:none; color:var(--ink-soft);
+    border-bottom:3px solid transparent; white-space:nowrap;
+  }
+  .modal-tab.active{color:var(--ink); border-bottom-color:var(--cobalt);}
+  .modal-tabpanel{display:none;}
+  .modal-tabpanel.active{display:block;}
+
+  .expect-banner{
+    border-radius:14px; padding:30px 24px; text-align:center; margin-bottom:16px; border:2px solid var(--ink);
+  }
+  .expect-banner .emoji{font-size:44px; display:block; margin-bottom:8px;}
+  .expect-banner p{margin:0; font-size:14px; color:var(--ink-soft); font-weight:600;}
+  .expect-body p{font-size:14.5px; line-height:1.7; color:var(--ink-soft);}
+
+  .resource-form input, .resource-form textarea{
+    width:100%; border:2px solid var(--ink); border-radius:12px; padding:10px 14px; font-family:inherit; font-size:13.5px;
+    background:var(--paper-raised); color:var(--ink); margin-bottom:10px;
+  }
+  .resource-form textarea{border-radius:12px; min-height:60px; resize:vertical;}
+  .resource-item{background:var(--paper); border:1.5px solid var(--line); border-radius:10px; padding:12px 14px; margin-bottom:10px;}
+  .resource-item .r-head{display:flex; justify-content:space-between; align-items:center; margin-bottom:5px;}
+  .resource-item .r-title{font-weight:700; font-size:14px;}
+  .resource-item .r-by{font-size:11.5px; color:var(--ink-soft); font-family:'IBM Plex Mono';}
+  .resource-item p{margin:4px 0 0; font-size:13px; color:var(--ink-soft); line-height:1.5;}
+  .resource-item a.r-link{font-size:12.5px; font-weight:700; color:var(--cobalt-deep); display:inline-block; margin-top:6px;}
+
+  /* ---------- Mentorship page ---------- */
+  .mentor-steps{display:grid; grid-template-columns:repeat(3,1fr); gap:18px; margin:40px 0 60px;}
+  .mentor-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:18px; margin:40px 0 60px;}
+  .mentor-card{background:var(--paper-raised); border:2px solid var(--ink); border-radius:var(--radius); padding:24px; text-align:center; transition:.2s;}
+  .mentor-card:hover{transform:translateY(-4px); box-shadow:6px 6px 0 var(--ink);}
+  .mentor-avatar{
+    width:64px; height:64px; border-radius:50%; margin:0 auto 14px; display:flex; align-items:center; justify-content:center;
+    font-family:'Space Grotesk'; font-weight:800; font-size:22px; color:#fff; border:2px solid var(--ink);
+  }
+  .mentor-card h3{font-size:17px; margin-bottom:4px;}
+  .mentor-card .m-course{font-size:12.5px; color:var(--ink-soft); font-family:'IBM Plex Mono'; margin-bottom:12px;}
+  .mentor-tags{display:flex; flex-wrap:wrap; gap:6px; justify-content:center; margin-bottom:16px;}
+
+  @media (max-width: 880px){
+    .mentor-steps, .mentor-grid{grid-template-columns:1fr;}
+  }
 </style>
 </head>
 <body>
@@ -403,6 +449,7 @@
       <nav class="main-nav" id="mainNav">
         <button class="nav-btn" data-page="home">Home</button>
         <button class="nav-btn" data-page="electives">Electives</button>
+        <button class="nav-btn" data-page="mentorship">Mentorship</button>
         <button class="nav-btn" data-page="about">About</button>
         <button class="nav-btn" data-page="community">Community</button>
       </nav>
@@ -423,6 +470,7 @@
     <div class="mobile-menu" id="mobileMenu">
       <button class="nav-btn" data-page="home">Home</button>
       <button class="nav-btn" data-page="electives">Electives</button>
+      <button class="nav-btn" data-page="mentorship">Mentorship</button>
       <button class="nav-btn" data-page="about">About</button>
       <button class="nav-btn" data-page="community">Community</button>
     </div>
@@ -543,6 +591,47 @@
   </section>
 
   <!-- ============ ABOUT ============ -->
+  <!-- ============ MENTORSHIP ============ -->
+  <section id="mentorship">
+    <div class="page-head">
+      <span class="eyebrow">Peer support</span>
+      <h1>Find a mentor, not just a module.</h1>
+      <p>Electives are easier to pick — and stick with — when you can ask a senior what it's actually like first. Our mentors are students who've already taken the electives you're eyeing and are happy to answer honest questions.</p>
+    </div>
+
+    <div class="mentor-steps">
+      <div class="why-card">
+        <span class="num">01</span>
+        <h3>Browse mentors below</h3>
+        <p>Each mentor lists what they've taken and what they're happy to talk about — pick whoever's closest to what you're considering.</p>
+      </div>
+      <div class="why-card">
+        <span class="num">02</span>
+        <h3>Message us on Telegram</h3>
+        <p>Mentors don't take DMs directly — post in the channel tagging who you'd like to reach, and we'll connect you.</p>
+      </div>
+      <div class="why-card">
+        <span class="num">03</span>
+        <h3>Ask anything, no pressure</h3>
+        <p>Workload, whether it's beginner-friendly, what the projects are like — mentors are there for exactly these questions.</p>
+      </div>
+    </div>
+
+    <div class="source-note">
+      🧑‍🎓 Mentor profiles below are a starting sample — if you're a senior willing to mentor, join the Telegram and let us know so we can add you.
+    </div>
+
+    <div class="mentor-grid" id="mentorGrid"></div>
+
+    <div class="full-listing-cta">
+      <div>
+        <h3>Want to become a mentor?</h3>
+        <p>If you've taken an elective outside your course and don't mind answering a few questions, we'd love to add you to the list.</p>
+      </div>
+      <a class="btn btn-lime" href="https://t.me/upskillingz" target="_blank" rel="noopener">Sign up on Telegram →</a>
+    </div>
+  </section>
+
   <section id="about">
     <div class="about-hero">
       <span class="eyebrow">About Upskillingz</span>
@@ -639,8 +728,8 @@
   <section id="admin">
     <div class="page-head">
       <span class="eyebrow">Moderator tools</span>
-      <h1>Review comments</h1>
-      <p>Approve genuine student comments, and remove anything vulgar, spammy, or off-topic. Not linked from the main nav — keep this URL to yourself.</p>
+      <h1>Review comments &amp; resources</h1>
+      <p>Approve genuine student comments and shared resources, and remove anything vulgar, spammy, or off-topic. Not linked from the main nav — keep this URL to yourself.</p>
     </div>
 
     <div class="admin-gate" id="adminGate">
@@ -652,20 +741,30 @@
 
     <div id="adminPanel" style="display:none;">
       <div class="filter-block">
-        <span class="filter-label">Pending review</span>
+        <span class="filter-label">Comments — pending review</span>
       </div>
       <div class="admin-list" id="adminPendingList"></div>
 
       <div class="filter-block" style="margin-top:40px;">
-        <span class="filter-label">Approved (visible on site)</span>
+        <span class="filter-label">Comments — approved (visible on site)</span>
       </div>
       <div class="admin-list" id="adminApprovedList"></div>
+
+      <div class="filter-block" style="margin-top:56px;">
+        <span class="filter-label">Resources — pending review</span>
+      </div>
+      <div class="admin-list" id="adminResPendingList"></div>
+
+      <div class="filter-block" style="margin-top:40px;">
+        <span class="filter-label">Resources — approved (visible on site)</span>
+      </div>
+      <div class="admin-list" id="adminResApprovedList"></div>
     </div>
   </section>
 
 </main>
 
-<!-- ============ RATING & COMMENT MODAL ============ -->
+<!-- ============ ELECTIVE DETAIL MODAL ============ -->
 <div class="modal-overlay" id="feedbackModal">
   <div class="modal-box">
     <button class="modal-close" onclick="closeFeedback()">✕</button>
@@ -673,25 +772,59 @@
     <h3 id="modalTitle"></h3>
     <p class="modal-sub" id="modalSub"></p>
 
-    <div class="rate-row">
-      <div>
-        <div class="star-input" id="starInput">
-          <button data-v="1">★</button><button data-v="2">★</button><button data-v="3">★</button><button data-v="4">★</button><button data-v="5">★</button>
+    <div class="modal-tabbar">
+      <button class="modal-tab active" data-tab="expect" onclick="switchModalTab('expect')">What to Expect</button>
+      <button class="modal-tab" data-tab="resources" onclick="switchModalTab('resources')">Resources</button>
+      <button class="modal-tab" data-tab="discussion" onclick="switchModalTab('discussion')">Discussion</button>
+    </div>
+
+    <!-- What to Expect -->
+    <div class="modal-tabpanel active" id="tabpanel-expect">
+      <div class="expect-banner" id="expectBanner">
+        <span class="emoji" id="expectEmoji">📚</span>
+        <p>What a typical session actually looks like</p>
+      </div>
+      <div class="expect-body"><p id="expectText"></p></div>
+    </div>
+
+    <!-- Resources -->
+    <div class="modal-tabpanel" id="tabpanel-resources">
+      <p style="font-size:13px; color:var(--ink-soft); margin-bottom:16px;">Notes, syllabus outlines and tips shared by seniors who've already taken this elective. Submissions are reviewed before they appear here.</p>
+      <div class="resource-form">
+        <input type="text" id="resName" placeholder="Your name or handle (optional)" maxlength="40">
+        <input type="text" id="resTitle" placeholder="Title — e.g. 'Midterm notes' or 'Week 3 syllabus outline'" maxlength="80">
+        <input type="text" id="resLink" placeholder="Link (optional) — Google Drive, PDF, etc." maxlength="300">
+        <textarea id="resNotes" placeholder="Any tips or context for other students..." maxlength="500"></textarea>
+        <div style="display:flex; justify-content:flex-end;">
+          <button class="btn btn-primary btn-sm" onclick="submitResource()">Share resource</button>
         </div>
-        <div class="rate-avg" id="modalAvg">No ratings yet</div>
+        <p class="comment-form-msg" id="resourceMsg"></p>
       </div>
+      <div class="comment-list" id="resourceList" style="margin-top:20px;"></div>
     </div>
 
-    <div class="comment-form">
-      <input type="text" id="commentName" placeholder="Name or handle (optional)" maxlength="40">
-      <textarea id="commentText" placeholder="Share a quick, honest take on this elective..." maxlength="400"></textarea>
-      <div style="display:flex; justify-content:flex-end; margin-top:10px;">
-        <button class="btn btn-primary btn-sm" onclick="submitComment()">Post comment</button>
+    <!-- Discussion (rating + comments) -->
+    <div class="modal-tabpanel" id="tabpanel-discussion">
+      <div class="rate-row">
+        <div>
+          <div class="star-input" id="starInput">
+            <button data-v="1">★</button><button data-v="2">★</button><button data-v="3">★</button><button data-v="4">★</button><button data-v="5">★</button>
+          </div>
+          <div class="rate-avg" id="modalAvg">No ratings yet</div>
+        </div>
       </div>
-      <p class="comment-form-msg" id="commentMsg"></p>
-    </div>
 
-    <div class="comment-list" id="commentList"></div>
+      <div class="comment-form">
+        <input type="text" id="commentName" placeholder="Name or handle (optional)" maxlength="40">
+        <textarea id="commentText" placeholder="Share a quick, honest take on this elective..." maxlength="400"></textarea>
+        <div style="display:flex; justify-content:flex-end; margin-top:10px;">
+          <button class="btn btn-primary btn-sm" onclick="submitComment()">Post comment</button>
+        </div>
+        <p class="comment-form-msg" id="commentMsg"></p>
+      </div>
+
+      <div class="comment-list" id="commentList"></div>
+    </div>
   </div>
 </div>
 
@@ -939,7 +1072,7 @@ function render(){
         <h3>${m.name}</h3>
         <p>${m.desc}</p>
         <button class="rate-btn" data-modid="${modId}" onclick="openFeedback('${m.poly}','${m.code.replace(/'/g,"\\'")}')">
-          ⭐ Rate &amp; discuss <span class="stars-display" id="stars-${modId}">loading…</span>
+          👀 What to expect, notes &amp; ratings <span class="stars-display" id="stars-${modId}">loading…</span>
         </button>
       </div>
       <div class="mod-card-bottom">
@@ -1024,6 +1157,31 @@ async function loadStarSummary(modId){
   } catch(e){ el.textContent = ''; }
 }
 
+// ---------- What to Expect content (templated by interest area) ----------
+const EXPECT_CONTENT = {
+  'Data Science': {emoji:'💻', text:"You'll spend most sessions in front of a laptop working with real datasets — cleaning messy spreadsheets, running queries, and building simple visualisations or models. Expect a mix of guided walkthroughs and independent problem-solving, usually wrapping up with a small project you can show off."},
+  'Design & Innovation': {emoji:'🎨', text:"Expect sketching, digital wireframing, and a lot of iteration based on peer feedback. You'll prototype using design software, run small usability tests with classmates, and present your work to the group."},
+  'Business & Management': {emoji:'📊', text:"Think case studies, group discussions and pitch-style presentations. You'll dig into a real (or realistic) business problem and propose a solution, usually working in small teams."},
+  'Art & Design': {emoji:'🖌️', text:"Hands-on studio time — sketching, digital illustration, and critique sessions where you share work-in-progress and get feedback from classmates and instructors."},
+  'Smart City and Mobility': {emoji:'🏙️', text:"You'll prototype small sensor or hardware setups, write basic code to read data from them, and think through how a real city problem — like traffic or energy use — could be tackled with connected devices."},
+  'Internationalisation': {emoji:'🌍', text:"Mostly conversation practice and small-group role-play, plus cultural context sessions. Expect to be speaking out loud a lot more than writing."},
+  'Sustainability': {emoji:'🌱', text:"A mix of case studies, lab work or design exercises depending on the module, all built around a real sustainability problem you'll work through over the term."},
+  'Manufacturing & Automation': {emoji:'⚙️', text:"Hands-on time in a lab or workshop — building or programming a small system, testing it, and troubleshooting when it doesn't work the first time (it usually doesn't)."},
+  'Maritime Studies': {emoji:'⚓', text:"An introduction to how ships and ports actually run, often paired with a simulation exercise or site visit alongside classroom sessions."},
+  'Music and Audio': {emoji:'🎧', text:"Studio and software time — recording, editing and mixing your own short pieces, with regular listening and critique sessions."},
+  'Psychology': {emoji:'🧠', text:"Discussion-heavy, built around real case studies and small experiments or surveys you might run yourself."},
+  'Digital Media': {emoji:'📱', text:"You'll be creating actual content — posts, short videos or graphics — and looking at what makes it perform, not just how it looks."},
+  'Preparatory Mathematics and Physics for University': {emoji:'📐', text:"Structured problem sets and worked examples, paced to fill specific gaps before a demanding degree programme."},
+  'Aerospace': {emoji:'✈️', text:"An introduction to how aircraft and their systems work, mixing theory with diagrams and, where possible, hands-on components."},
+  'Science': {emoji:'🔬', text:"Lab-based — you'll be running real experiments, recording data, and writing up findings, with safety procedures taken seriously from day one."},
+};
+const EXPECT_DEFAULT = {emoji:'📚', text:"Expect a hands-on mix of lectures, discussion and practical exercises, usually building toward a small project or presentation by the end of the module."};
+
+function switchModalTab(tab){
+  document.querySelectorAll('.modal-tab').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
+  document.querySelectorAll('.modal-tabpanel').forEach(p => p.classList.toggle('active', p.id === `tabpanel-${tab}`));
+}
+
 // ---------- Modal ----------
 let currentModId = null, currentModName = null, currentStars = 0;
 function findModule(poly, code){ return MODULES.find(m => m.poly === poly && m.code === code); }
@@ -1038,17 +1196,31 @@ function openFeedback(poly, code){
   document.getElementById('modalTags').innerHTML = `<span class="tag-poly" style="background:${p.color}">${p.label}</span><span class="tag-school">${m.school.replace('School of ','')}</span>`;
   document.getElementById('modalTitle').textContent = m.name;
   document.getElementById('modalSub').textContent = m.desc;
+
+  const expect = EXPECT_CONTENT[m.interest] || EXPECT_DEFAULT;
+  document.getElementById('expectEmoji').textContent = expect.emoji;
+  document.getElementById('expectText').textContent = expect.text;
+  document.getElementById('expectBanner').style.background = `${p.color}22`;
+
   document.getElementById('commentName').value = '';
   document.getElementById('commentText').value = '';
   document.getElementById('commentMsg').textContent = '';
+  document.getElementById('resName').value = '';
+  document.getElementById('resTitle').value = '';
+  document.getElementById('resLink').value = '';
+  document.getElementById('resNotes').value = '';
+  document.getElementById('resourceMsg').textContent = '';
   document.querySelectorAll('#starInput button').forEach(b => b.classList.remove('filled'));
   document.getElementById('modalAvg').textContent = 'Loading...';
   document.getElementById('commentList').innerHTML = '<p class="comment-empty">Loading comments...</p>';
+  document.getElementById('resourceList').innerHTML = '<p class="comment-empty">Loading resources...</p>';
+  switchModalTab('expect');
   document.getElementById('feedbackModal').classList.add('open');
-  if(feedbackReady){ loadModalAvg(); loadComments(); }
+  if(feedbackReady){ loadModalAvg(); loadComments(); loadResources(); }
   else {
     document.getElementById('modalAvg').textContent = 'Ratings not set up yet';
     document.getElementById('commentList').innerHTML = '<p class="comment-empty">Comments aren\'t connected yet — see setup notes.</p>';
+    document.getElementById('resourceList').innerHTML = '<p class="comment-empty">Resources aren\'t connected yet — see setup notes.</p>';
   }
 }
 function closeFeedback(){ document.getElementById('feedbackModal').classList.remove('open'); }
@@ -1128,6 +1300,92 @@ async function submitComment(){
   } catch(e){ msgEl.textContent = 'Something went wrong — try again.'; msgEl.classList.add('err'); }
 }
 
+// ---------- Resources (senior notes / syllabus / tips) ----------
+async function loadResources(){
+  const list = document.getElementById('resourceList');
+  try{
+    const snap = await db.collection('resources')
+      .where('moduleId','==', currentModId)
+      .where('status','==','approved')
+      .get();
+    if(snap.empty){ list.innerHTML = '<p class="comment-empty">No resources shared yet — be the first senior to help out.</p>'; return; }
+    const items = []; snap.forEach(d => items.push(d.data()));
+    items.sort((a,b) => b.ts - a.ts);
+    list.innerHTML = items.map(r => `
+      <div class="resource-item">
+        <div class="r-head"><span class="r-title">${escapeHtml(r.title || 'Untitled resource')}</span><span class="r-by">${escapeHtml(r.name || 'Anonymous alum')}</span></div>
+        ${r.notes ? `<p>${escapeHtml(r.notes)}</p>` : ''}
+        ${r.link ? `<a class="r-link" href="${escapeAttr(r.link)}" target="_blank" rel="noopener">Open resource ↗</a>` : ''}
+      </div>
+    `).join('');
+  } catch(e){ list.innerHTML = '<p class="comment-empty">Couldn\'t load resources right now.</p>'; }
+}
+
+function escapeAttr(str){
+  // only allow http(s) links to avoid javascript: URLs
+  const s = (str || '').trim();
+  return /^https?:\/\//i.test(s) ? s.replace(/"/g,'%22') : '#';
+}
+
+async function submitResource(){
+  const msgEl = document.getElementById('resourceMsg');
+  const nameEl = document.getElementById('resName');
+  const titleEl = document.getElementById('resTitle');
+  const linkEl = document.getElementById('resLink');
+  const notesEl = document.getElementById('resNotes');
+  msgEl.className = 'comment-form-msg';
+
+  if(!feedbackReady){ msgEl.textContent = 'Resources aren\'t set up yet.'; msgEl.classList.add('err'); return; }
+  if(!titleEl.value.trim()){ msgEl.textContent = 'Give your resource a short title.'; msgEl.classList.add('err'); return; }
+  if(linkEl.value.trim() && !/^https?:\/\//i.test(linkEl.value.trim())){ msgEl.textContent = 'Link should start with http:// or https://'; msgEl.classList.add('err'); return; }
+  const combined = `${titleEl.value} ${notesEl.value}`;
+  const problem = moderateText(combined.length > 3 ? combined : 'placeholder text');
+  if(notesEl.value && moderateText(notesEl.value)){ msgEl.textContent = moderateText(notesEl.value); msgEl.classList.add('err'); return; }
+  const badWordsInTitle = BANNED_WORDS.some(w => titleEl.value.toLowerCase().includes(w));
+  if(badWordsInTitle){ msgEl.textContent = 'Please keep the title respectful.'; msgEl.classList.add('err'); return; }
+
+  try{
+    await db.collection('resources').add({
+      moduleId: currentModId,
+      name: (nameEl.value || '').trim().slice(0,40),
+      title: titleEl.value.trim().slice(0,80),
+      link: linkEl.value.trim().slice(0,300),
+      notes: notesEl.value.trim().slice(0,500),
+      status: 'pending',
+      ts: Date.now()
+    });
+    titleEl.value = ''; linkEl.value = ''; notesEl.value = ''; nameEl.value = '';
+    msgEl.textContent = 'Thanks for sharing! It\'ll appear here once a moderator approves it.';
+    msgEl.classList.add('ok');
+  } catch(e){ msgEl.textContent = 'Something went wrong — try again.'; msgEl.classList.add('err'); }
+}
+
+// ---------- Mentors ----------
+const MENTORS = [
+  {name:'Sarah Lim', course:'Year 3 · Marketing', color:'#3542FF', tags:['Digital Media','Business & Management'], blurb:"Took the Social Media & Content Strategy elective — happy to talk through what the projects actually involve."},
+  {name:'Rayhan Aziz', course:'Year 3 · Computer Engineering', color:'#00A67E', tags:['Data Science','Smart City and Mobility'], blurb:"Went through the Applied Machine Learning and IoT electives — ask about workload and beginner-friendliness."},
+  {name:'Michelle Tan', course:'Year 2 · Interactive Media Design', course2:'', color:'#E8552B', tags:['Design & Innovation','Art & Design'], blurb:"Took UX Design and Digital Illustration Studio — can share portfolio tips too."},
+  {name:'Faris Rahman', course:'Year 3 · Maritime Business', color:'#9C4DFF', tags:['Maritime Studies','Sustainability'], blurb:"Completed Maritime Fundamentals — good person to ask if you're curious but not from a maritime course."},
+  {name:'Priya Nathan', course:'Year 2 · Applied Science', color:'#D6336C', tags:['Science','Sustainability'], blurb:"Took several Science-category modules at RP — happy to explain lab expectations before you commit."},
+  {name:'Wei Jie Ong', course:'Year 3 · Business Studies', color:'#F5A524', tags:['Internationalisation','Business & Management'], blurb:"Picked up Korean language and culture electives on top of his diploma — ask about balancing workload."},
+];
+function initials(name){ return name.split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase(); }
+function renderMentors(){
+  const grid = document.getElementById('mentorGrid');
+  if(!grid) return;
+  grid.innerHTML = MENTORS.map(m => `
+    <div class="mentor-card">
+      <div class="mentor-avatar" style="background:${m.color}">${initials(m.name)}</div>
+      <h3>${escapeHtml(m.name)}</h3>
+      <div class="m-course">${escapeHtml(m.course)}</div>
+      <div class="mentor-tags">${m.tags.map(t => `<span class="tag-interest">${escapeHtml(t)}</span>`).join('')}</div>
+      <p style="font-size:13px; color:var(--ink-soft); line-height:1.5; margin-bottom:16px;">${escapeHtml(m.blurb)}</p>
+      <a class="btn btn-primary btn-sm" href="https://t.me/upskillingz" target="_blank" rel="noopener">Message via Telegram →</a>
+    </div>
+  `).join('');
+}
+renderMentors();
+
 // ---------- Admin / moderation panel ----------
 function checkAdminPass(){
   const val = document.getElementById('adminPassInput').value;
@@ -1135,6 +1393,7 @@ function checkAdminPass(){
     document.getElementById('adminGate').style.display = 'none';
     document.getElementById('adminPanel').style.display = 'block';
     loadAdminComments();
+    loadAdminResources();
   } else {
     document.getElementById('adminGateMsg').textContent = 'Wrong password.';
   }
@@ -1154,21 +1413,44 @@ async function loadAdminComments(){
   const pending = all.filter(c => c.status === 'pending');
   const approved = all.filter(c => c.status === 'approved');
 
-  pendingEl.innerHTML = pending.length ? pending.map(adminItemHtml).join('') : '<p class="comment-empty">No comments waiting for review 🎉</p>';
-  approvedEl.innerHTML = approved.length ? approved.map(adminItemHtml).join('') : '<p class="comment-empty">Nothing approved yet.</p>';
+  pendingEl.innerHTML = pending.length ? pending.map(c => adminItemHtml(c,'comment')).join('') : '<p class="comment-empty">No comments waiting for review 🎉</p>';
+  approvedEl.innerHTML = approved.length ? approved.map(c => adminItemHtml(c,'comment')).join('') : '<p class="comment-empty">Nothing approved yet.</p>';
 }
 
-function adminItemHtml(c){
+async function loadAdminResources(){
+  const pendingEl = document.getElementById('adminResPendingList');
+  const approvedEl = document.getElementById('adminResApprovedList');
+  pendingEl.innerHTML = '<p class="comment-empty">Loading...</p>';
+  approvedEl.innerHTML = '';
+  if(!feedbackReady){ pendingEl.innerHTML = '<p class="comment-empty">Resources aren\'t set up yet — add your Firebase config first.</p>'; return; }
+
+  const snap = await db.collection('resources').get();
+  const all = []; snap.forEach(d => all.push({id:d.id, ...d.data()}));
+  all.sort((a,b) => b.ts - a.ts);
+
+  const pending = all.filter(c => c.status === 'pending');
+  const approved = all.filter(c => c.status === 'approved');
+
+  pendingEl.innerHTML = pending.length ? pending.map(c => adminItemHtml(c,'resource')).join('') : '<p class="comment-empty">No resources waiting for review 🎉</p>';
+  approvedEl.innerHTML = approved.length ? approved.map(c => adminItemHtml(c,'resource')).join('') : '<p class="comment-empty">Nothing approved yet.</p>';
+}
+
+function adminItemHtml(c, kind){
+  const bodyText = kind === 'resource'
+    ? `<strong>${escapeHtml(c.title || 'Untitled')}</strong>${c.notes ? ' — ' + escapeHtml(c.notes) : ''}${c.link ? ` (<a href="${escapeAttr(c.link)}" target="_blank" rel="noopener">link</a>)` : ''}`
+    : escapeHtml(c.text);
+  const approveFn = kind === 'resource' ? 'approveResource' : 'approveComment';
+  const deleteFn = kind === 'resource' ? 'deleteResource' : 'deleteComment';
   return `
     <div class="admin-item">
       <div class="a-head">
         <span>${escapeHtml(c.name || 'Anonymous')} · ${c.moduleId} · ${new Date(c.ts).toLocaleString()}</span>
         <span class="status-pill ${c.status}">${c.status}</span>
       </div>
-      <p>${escapeHtml(c.text)}</p>
+      <p>${bodyText}</p>
       <div class="admin-actions">
-        ${c.status === 'pending' ? `<button class="btn-approve" onclick="approveComment('${c.id}')">Approve</button>` : ''}
-        <button class="btn-reject" onclick="deleteComment('${c.id}')">Delete</button>
+        ${c.status === 'pending' ? `<button class="btn-approve" onclick="${approveFn}('${c.id}')">Approve</button>` : ''}
+        <button class="btn-reject" onclick="${deleteFn}('${c.id}')">Delete</button>
       </div>
     </div>`;
 }
@@ -1181,6 +1463,15 @@ async function deleteComment(id){
   await db.collection('comments').doc(id).delete();
   loadAdminComments();
 }
+async function approveResource(id){
+  await db.collection('resources').doc(id).update({status:'approved'});
+  loadAdminResources();
+}
+async function deleteResource(id){
+  await db.collection('resources').doc(id).delete();
+  loadAdminResources();
+}
+
 
 </script>
 
