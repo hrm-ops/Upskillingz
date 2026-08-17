@@ -435,6 +435,58 @@
   @media (max-width: 880px){
     .mentor-steps, .mentor-grid{grid-template-columns:1fr;}
   }
+
+  /* ---------- Login ---------- */
+  .login-btn{
+    padding:9px 16px; font-size:13.5px; font-weight:700; border:2px solid var(--ink); border-radius:999px;
+    background:var(--paper-raised); color:var(--ink); transition:.15s; white-space:nowrap;
+  }
+  .login-btn:hover{background:var(--ink); color:var(--paper-raised);}
+  .login-form label{
+    font-family:'IBM Plex Mono'; font-size:11px; text-transform:uppercase; letter-spacing:.05em;
+    color:var(--ink-soft); margin-bottom:6px; display:block;
+  }
+  .login-form input, .login-form select{
+    width:100%; border:2px solid var(--ink); border-radius:12px; padding:10px 14px; font-family:inherit; font-size:14px;
+    background:var(--paper-raised); color:var(--ink); margin-bottom:14px;
+  }
+  .login-note{font-size:12.5px; color:var(--ink-soft); line-height:1.55; margin:8px 0 18px;}
+  .login-profile-avatar{
+    width:56px; height:56px; border-radius:50%; background:var(--cobalt); color:#fff; display:flex;
+    align-items:center; justify-content:center; font-family:'Space Grotesk'; font-weight:800; font-size:20px; margin-bottom:14px;
+  }
+
+  /* ---------- Quiz ---------- */
+  .quiz-gate{max-width:420px; margin:50px auto;}
+  .quiz-step{
+    font-family:'IBM Plex Mono'; font-size:12px; color:var(--ink-soft); text-transform:uppercase;
+    letter-spacing:.06em; margin-bottom:10px; text-align:center;
+  }
+  .quiz-progress-track{
+    height:8px; background:rgba(22,23,43,0.08); border-radius:999px; overflow:hidden; margin-bottom:30px;
+    border:2px solid var(--ink); max-width:640px; margin-left:auto; margin-right:auto;
+  }
+  .quiz-progress-fill{height:100%; background:var(--cobalt); transition:width .3s ease;}
+  .quiz-card{
+    background:var(--paper-raised); border:2px solid var(--ink); border-radius:20px; padding:36px;
+    max-width:640px; margin:0 auto;
+  }
+  .quiz-question{font-family:'Space Grotesk'; font-weight:700; font-size:24px; margin-bottom:24px; line-height:1.3;}
+  .quiz-options{display:grid; gap:10px; margin-bottom:28px;}
+  .quiz-option{
+    text-align:left; padding:16px 18px; border:2px solid var(--ink); border-radius:12px; background:var(--paper);
+    font-size:14.5px; font-weight:600; transition:.15s;
+  }
+  .quiz-option:hover{background:rgba(53,66,255,0.08);}
+  .quiz-option.selected{background:var(--cobalt); border-color:var(--cobalt); color:#fff;}
+  .quiz-nav{display:flex; justify-content:space-between; gap:12px;}
+  .quiz-nav button:disabled{opacity:.4; cursor:not-allowed;}
+  .quiz-result-tags{display:flex; flex-wrap:wrap; gap:8px; margin:14px 0 22px;}
+  .quiz-result-actions{display:flex; gap:12px; flex-wrap:wrap; margin-top:22px;}
+  @media (max-width: 560px){
+    .quiz-card{padding:24px;}
+    .quiz-question{font-size:20px;}
+  }
 </style>
 </head>
 <body>
@@ -449,11 +501,13 @@
       <nav class="main-nav" id="mainNav">
         <button class="nav-btn" data-page="home">Home</button>
         <button class="nav-btn" data-page="electives">Electives</button>
+        <button class="nav-btn" data-page="quiz">Quiz</button>
         <button class="nav-btn" data-page="mentorship">Mentorship</button>
         <button class="nav-btn" data-page="about">About</button>
         <button class="nav-btn" data-page="community">Community</button>
       </nav>
       <div style="display:flex; align-items:center; gap:10px;">
+        <button class="login-btn" id="loginBtn" onclick="openLogin()">Log in</button>
         <div class="nav-socials">
           <a class="icon-link" href="https://t.me/upskillingz" target="_blank" rel="noopener" title="Telegram">
             <svg viewBox="0 0 24 24" fill="none"><path d="M21.5 3L2.5 10.5L9 13L11.5 20L14.5 14.5L19.5 18L21.5 3Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M9 13L19.5 5" stroke="currentColor" stroke-width="1.7"/></svg>
@@ -470,6 +524,7 @@
     <div class="mobile-menu" id="mobileMenu">
       <button class="nav-btn" data-page="home">Home</button>
       <button class="nav-btn" data-page="electives">Electives</button>
+      <button class="nav-btn" data-page="quiz">Quiz</button>
       <button class="nav-btn" data-page="mentorship">Mentorship</button>
       <button class="nav-btn" data-page="about">About</button>
       <button class="nav-btn" data-page="community">Community</button>
@@ -587,6 +642,56 @@
         <p id="fullListingCopy">Each school updates its official listing every semester with the complete, registration-ready set of electives.</p>
       </div>
       <a class="btn btn-lime" id="fullListingLink" href="https://www.sp.edu.sg/courses/poly-wide-curriculum/electives-minors-and-certificates/elective-module-listing" target="_blank" rel="noopener">View full official listing →</a>
+    </div>
+  </section>
+
+  <!-- ============ QUIZ ============ -->
+  <section id="quiz">
+    <div class="page-head">
+      <span class="eyebrow">Not sure where to start?</span>
+      <h1>Find electives that fit you.</h1>
+      <p>Answer a few quick questions about what you actually enjoy, and we'll surface electives from the sample set — across SP, NYP &amp; RP — that match. Same repository as the Electives page, just pointed at you.</p>
+    </div>
+
+    <div class="quiz-gate" id="quizGate">
+      <div class="empty-state" style="border-color:var(--cobalt); background:#E9EDFF;">
+        <h3>Log in to get your matches</h3>
+        <p>A quick, no-password sign-in so we can save your results on this device and greet you by name next time.</p>
+        <button class="btn btn-primary" onclick="openLogin()">Log in to start →</button>
+      </div>
+    </div>
+
+    <div id="quizBody" style="display:none;">
+      <div id="quizQuestionView">
+        <div class="quiz-step" id="quizStep">Question 1 of 7</div>
+        <div class="quiz-progress-track"><div class="quiz-progress-fill" id="quizProgressFill" style="width:0%;"></div></div>
+        <div class="quiz-card">
+          <div class="quiz-question" id="quizQuestionText"></div>
+          <div class="quiz-options" id="quizOptions"></div>
+          <div class="quiz-nav">
+            <button class="btn btn-ghost btn-sm" id="quizBackBtn" onclick="quizBack()">← Back</button>
+            <button class="btn btn-primary btn-sm" id="quizNextBtn" onclick="quizNext()" disabled>Next →</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="quizResultView" style="display:none;">
+        <div class="quiz-card" style="margin-bottom:36px;">
+          <span class="eyebrow" id="quizResultIntro">Nice — based on your answers, these interest areas fit you best:</span>
+          <h2 style="margin:10px 0 0; font-size:24px;">Your top matches</h2>
+          <div class="quiz-result-tags" id="quizResultTags"></div>
+          <div class="quiz-result-actions">
+            <button class="btn btn-primary btn-sm" onclick="browseRecommended()">Browse these in Electives →</button>
+            <button class="btn btn-ghost btn-sm" onclick="retakeQuiz()">Retake quiz</button>
+          </div>
+        </div>
+        <div class="card-grid" id="quizResultGrid"></div>
+        <div class="empty-state" id="quizResultEmpty" style="display:none;">
+          <h3>No sample electives match yet</h3>
+          <p>Try retaking the quiz with a different polytechnic preference, or browse everything in Electives.</p>
+          <button class="btn btn-primary" onclick="goTo('electives')">Browse all electives →</button>
+        </div>
+      </div>
     </div>
   </section>
 
@@ -828,6 +933,42 @@
   </div>
 </div>
 
+<div class="modal-overlay" id="loginModal">
+  <div class="modal-box" style="max-width:420px;">
+    <button class="modal-close" onclick="closeLogin()">✕</button>
+
+    <div id="loginFormView" class="login-form">
+      <h3>Quick sign-in</h3>
+      <p class="login-note">No password or email needed — just a name so we can personalize your elective quiz and greet you by name. Saved only on this device, nothing is sent anywhere.</p>
+      <label for="loginName">Name</label>
+      <input id="loginName" type="text" placeholder="e.g. Alex Tan" maxlength="40">
+      <label for="loginCourse">Course &amp; year (optional)</label>
+      <input id="loginCourse" type="text" placeholder="e.g. Year 2 · Business Studies" maxlength="60">
+      <label for="loginPoly">Your polytechnic (optional)</label>
+      <select id="loginPoly">
+        <option value="">Prefer not to say</option>
+        <option value="SP">Singapore Polytechnic</option>
+        <option value="NYP">Nanyang Polytechnic</option>
+        <option value="RP">Republic Polytechnic</option>
+        <option value="NP">Ngee Ann Polytechnic</option>
+        <option value="TP">Temasek Polytechnic</option>
+      </select>
+      <p class="comment-form-msg" id="loginMsg"></p>
+      <button class="btn btn-primary" style="width:100%; justify-content:center;" onclick="submitLogin()">Sign in →</button>
+    </div>
+
+    <div id="loginProfileView" style="display:none;">
+      <div class="login-profile-avatar" id="loginProfileAvatar"></div>
+      <h3 id="loginProfileName"></h3>
+      <p class="modal-sub" id="loginProfileMeta"></p>
+      <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:10px;">
+        <button class="btn btn-primary btn-sm" onclick="closeLogin(); goTo('quiz');">Take the quiz →</button>
+        <button class="btn btn-ghost btn-sm" onclick="logout()">Log out</button>
+      </div>
+    </div>
+  </div>
+</div>
+
   <div class="wrap">
     <div class="footer-grid">
       <div class="footer-brand">
@@ -876,6 +1017,7 @@ function goTo(page){
   document.querySelectorAll('.nav-btn').forEach(b => b.classList.toggle('active', b.dataset.page === page));
   document.getElementById('mobileMenu').classList.remove('open');
   window.scrollTo({top:0, behavior:'smooth'});
+  if(page === 'quiz') renderQuizPage();
 }
 document.querySelectorAll('.nav-btn[data-page]').forEach(btn => {
   btn.addEventListener('click', () => goTo(btn.dataset.page));
@@ -885,6 +1027,270 @@ document.querySelector('.nav-btn[data-page="home"]').classList.add('active');
 function toggleMobileMenu(){
   document.getElementById('mobileMenu').classList.toggle('open');
 }
+
+// ---------- Login (lightweight local profile — no password/backend) ----------
+const USER_KEY = 'upskillingz_user';
+function getUser(){ try{ return JSON.parse(localStorage.getItem(USER_KEY)); }catch(e){ return null; } }
+function saveUser(u){ localStorage.setItem(USER_KEY, JSON.stringify(u)); }
+function clearUser(){ localStorage.removeItem(USER_KEY); }
+
+function openLogin(){
+  const u = getUser();
+  const formView = document.getElementById('loginFormView');
+  const profileView = document.getElementById('loginProfileView');
+  if(u){
+    formView.style.display = 'none';
+    profileView.style.display = 'block';
+    document.getElementById('loginProfileAvatar').textContent = initials(u.name);
+    document.getElementById('loginProfileName').textContent = u.name;
+    document.getElementById('loginProfileMeta').textContent = [u.course, u.poly ? POLYS[u.poly].label : ''].filter(Boolean).join(' · ') || 'No extra details saved';
+  } else {
+    formView.style.display = 'block';
+    profileView.style.display = 'none';
+    document.getElementById('loginMsg').textContent = '';
+    document.getElementById('loginMsg').className = 'comment-form-msg';
+  }
+  document.getElementById('loginModal').classList.add('open');
+}
+function closeLogin(){ document.getElementById('loginModal').classList.remove('open'); }
+
+function submitLogin(){
+  const nameEl = document.getElementById('loginName');
+  const courseEl = document.getElementById('loginCourse');
+  const polyEl = document.getElementById('loginPoly');
+  const msgEl = document.getElementById('loginMsg');
+  const name = nameEl.value.trim();
+  if(!name){ msgEl.textContent = 'Enter a name so we can greet you right.'; msgEl.className = 'comment-form-msg err'; return; }
+  saveUser({name: name.slice(0,40), course: courseEl.value.trim().slice(0,60), poly: polyEl.value});
+  nameEl.value = ''; courseEl.value = ''; polyEl.value = '';
+  closeLogin();
+  refreshLoginUI();
+  if(document.getElementById('quiz').classList.contains('active')) renderQuizPage();
+}
+
+function logout(){
+  clearUser();
+  closeLogin();
+  refreshLoginUI();
+  if(document.getElementById('quiz').classList.contains('active')) renderQuizPage();
+}
+
+function refreshLoginUI(){
+  const u = getUser();
+  document.getElementById('loginBtn').textContent = u ? `Hi, ${u.name.split(' ')[0]}` : 'Log in';
+}
+
+// ---------- Elective-matching quiz ----------
+const QUIZ_QUESTIONS = [
+  { q: "When you've got free time, you're most likely...", options: [
+      {label:'Tinkering with gadgets or building something', tags:['Manufacturing & Automation']},
+      {label:'Sketching, editing photos or video', tags:['Art & Design']},
+      {label:'Reading up on business news or side-hustle ideas', tags:['Business & Management']},
+      {label:'Watching documentaries about the planet', tags:['Sustainability']},
+  ]},
+  { q: "Which of these projects would you enjoy most?", options: [
+      {label:'Digging through a dataset to find a hidden trend', tags:['Data Science']},
+      {label:'Designing an app that fixes a daily annoyance', tags:['Design & Innovation']},
+      {label:'Producing a short podcast or music track', tags:['Music and Audio']},
+      {label:'Planning a community garden or clean-up', tags:['Sustainability']},
+  ]},
+  { q: "Pick a topic you'd happily go down a rabbit hole on:", options: [
+      {label:'A new language and culture', tags:['Internationalisation']},
+      {label:'How ships and global trade work', tags:['Maritime Studies']},
+      {label:'How planes and rockets fly', tags:['Aerospace']},
+      {label:'How the brain makes decisions', tags:['Psychology']},
+  ]},
+  { q: "In a group project, you're usually the one who...", options: [
+      {label:'Crunches the numbers and finds the patterns', tags:['Data Science']},
+      {label:'Makes the slides and visuals actually pop', tags:['Digital Media']},
+      {label:'Pitches the idea and manages the budget', tags:['Business & Management']},
+      {label:'Double-checks the technical or scientific details', tags:['Science']},
+  ]},
+  { q: "Which future pulls you in most?", options: [
+      {label:'Building smarter, greener cities', tags:['Smart City and Mobility']},
+      {label:'Running your own brand', tags:['Business & Management']},
+      {label:'Working in a lab discovering new things', tags:['Science']},
+      {label:'Making content people actually enjoy', tags:['Digital Media']},
+  ]},
+  { q: "Any of these subjects give you a spark?", options: [
+      {label:'Physics & maths that feed into an engineering degree', tags:['Preparatory Mathematics and Physics for University']},
+      {label:'Psychology and human behaviour', tags:['Psychology']},
+      {label:'Marine life and the ocean', tags:['Maritime Studies']},
+      {label:'Flight, space and aerospace tech', tags:['Aerospace']},
+  ]},
+  { q: "Any polytechnic preference for your recommendations?", poly:true, options: [
+      {label:'SP only', value:'SP'},
+      {label:'NYP only', value:'NYP'},
+      {label:'RP only', value:'RP'},
+      {label:'No preference — show me all', value:'ALL'},
+  ]},
+];
+
+let quizIndex = 0;
+let quizAnswers = [];
+let quizRetaking = false;
+let lastQuizTags = [];
+let lastQuizPoly = 'ALL';
+
+function quizStorageKey(){
+  const u = getUser();
+  return u ? `upskillingz_quiz_${u.name.toLowerCase().replace(/\s+/g,'_')}` : null;
+}
+
+function renderQuizPage(){
+  const gate = document.getElementById('quizGate');
+  const body = document.getElementById('quizBody');
+  const u = getUser();
+  if(!u){
+    gate.style.display = 'block';
+    body.style.display = 'none';
+    return;
+  }
+  gate.style.display = 'none';
+  body.style.display = 'block';
+
+  const key = quizStorageKey();
+  let saved = null;
+  try{ saved = key ? JSON.parse(localStorage.getItem(key)) : null; }catch(e){ saved = null; }
+
+  if(saved && !quizRetaking){
+    lastQuizTags = saved.topTags; lastQuizPoly = saved.poly;
+    showQuizResults(saved.topTags, saved.poly, true);
+  } else {
+    startQuiz();
+  }
+}
+
+function retakeQuiz(){ quizRetaking = true; startQuiz(); }
+
+function startQuiz(){
+  quizRetaking = false;
+  quizIndex = 0;
+  quizAnswers = new Array(QUIZ_QUESTIONS.length).fill(null);
+  document.getElementById('quizResultView').style.display = 'none';
+  document.getElementById('quizQuestionView').style.display = 'block';
+  renderQuizQuestion();
+}
+
+function renderQuizQuestion(){
+  const q = QUIZ_QUESTIONS[quizIndex];
+  document.getElementById('quizProgressFill').style.width = `${(quizIndex / QUIZ_QUESTIONS.length) * 100}%`;
+  document.getElementById('quizStep').textContent = `Question ${quizIndex + 1} of ${QUIZ_QUESTIONS.length}`;
+  document.getElementById('quizQuestionText').textContent = q.q;
+  const opts = document.getElementById('quizOptions');
+  opts.innerHTML = q.options.map((o, i) => `
+    <button class="quiz-option${quizAnswers[quizIndex] === i ? ' selected' : ''}" onclick="selectQuizOption(${i})">${escapeHtml(o.label)}</button>
+  `).join('');
+  document.getElementById('quizBackBtn').style.display = quizIndex === 0 ? 'none' : 'inline-flex';
+  const nextBtn = document.getElementById('quizNextBtn');
+  nextBtn.textContent = quizIndex === QUIZ_QUESTIONS.length - 1 ? 'See my recommendations →' : 'Next →';
+  nextBtn.disabled = quizAnswers[quizIndex] == null;
+}
+
+function selectQuizOption(i){
+  quizAnswers[quizIndex] = i;
+  renderQuizQuestion();
+}
+
+function quizBack(){
+  if(quizIndex > 0){ quizIndex--; renderQuizQuestion(); }
+}
+
+function quizNext(){
+  if(quizAnswers[quizIndex] == null) return;
+  if(quizIndex < QUIZ_QUESTIONS.length - 1){
+    quizIndex++;
+    renderQuizQuestion();
+  } else {
+    finishQuiz();
+  }
+}
+
+function finishQuiz(){
+  const scores = {};
+  let polyPref = 'ALL';
+  quizAnswers.forEach((ansIdx, qi) => {
+    const question = QUIZ_QUESTIONS[qi];
+    const opt = question.options[ansIdx];
+    if(question.poly){ polyPref = opt.value; }
+    else { opt.tags.forEach(t => { scores[t] = (scores[t] || 0) + 1; }); }
+  });
+
+  const sorted = Object.entries(scores).sort((a, b) => b[1] - a[1]);
+  const topScore = sorted.length ? sorted[0][1] : 0;
+  let finalTags = sorted.filter(([, s]) => s === topScore).map(([t]) => t);
+  if(finalTags.length < 2){
+    const rest = sorted.filter(([, s]) => s !== topScore);
+    finalTags = finalTags.concat(rest.slice(0, 2 - finalTags.length).map(([t]) => t));
+  }
+  finalTags = finalTags.slice(0, 3);
+
+  lastQuizTags = finalTags;
+  lastQuizPoly = polyPref;
+
+  const key = quizStorageKey();
+  if(key){ localStorage.setItem(key, JSON.stringify({topTags: finalTags, poly: polyPref, ts: Date.now()})); }
+
+  quizRetaking = false;
+  showQuizResults(finalTags, polyPref, false);
+}
+
+function showQuizResults(tags, poly, fromSaved){
+  document.getElementById('quizQuestionView').style.display = 'none';
+  document.getElementById('quizResultView').style.display = 'block';
+  document.getElementById('quizResultIntro').textContent = fromSaved
+    ? "Welcome back — here's what we recommended last time, based on your answers:"
+    : 'Nice — based on your answers, these interest areas fit you best:';
+  document.getElementById('quizResultTags').innerHTML = tags.map(t => `<span class="tag-interest">${escapeHtml(t)}</span>`).join('');
+
+  let matches = MODULES.filter(m => tags.includes(m.interest));
+  if(poly && poly !== 'ALL'){ matches = matches.filter(m => m.poly === poly); }
+  matches.sort((a, b) => tags.indexOf(a.interest) - tags.indexOf(b.interest));
+  matches = matches.slice(0, 6);
+
+  const grid = document.getElementById('quizResultGrid');
+  const empty = document.getElementById('quizResultEmpty');
+  if(matches.length === 0){
+    grid.innerHTML = '';
+    empty.style.display = 'block';
+  } else {
+    empty.style.display = 'none';
+    grid.innerHTML = matches.map(m => quizModCardHtml(m)).join('');
+  }
+}
+
+function quizModCardHtml(m){
+  const p = POLYS[m.poly];
+  const link = m.link || p.source;
+  return `
+    <div class="mod-card">
+      <div class="mod-card-top">
+        <div class="mod-tags">
+          <span class="tag-poly" style="background:${p.color}">${p.label}</span>
+          <span class="tag-interest">${escapeHtml(m.interest)}</span>
+        </div>
+        <h3>${escapeHtml(m.name)}</h3>
+        <p>${escapeHtml(m.desc)}</p>
+      </div>
+      <div class="mod-card-bottom">
+        <span class="mod-code">${escapeHtml(m.code)}</span>
+        <a class="mod-link" href="${link}" target="_blank" rel="noopener">Check on ${p.label} ↗</a>
+      </div>
+    </div>`;
+}
+
+function browseRecommended(){
+  activeInterests = new Set(lastQuizTags);
+  activeSchools.clear();
+  activePoly = (lastQuizPoly && lastQuizPoly !== 'ALL') ? lastQuizPoly : 'ALL';
+  document.getElementById('searchInput').value = '';
+  buildPolyChips();
+  buildSecondaryChips();
+  render();
+  goTo('electives');
+}
+
+refreshLoginUI();
 
 // ---------- Polytechnic config ----------
 const POLYS = {
